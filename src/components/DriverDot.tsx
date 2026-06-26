@@ -67,7 +67,8 @@ export default function DriverDot({ racer, trackId, svgPath, isUser, pathOffset,
   if (isInPit) return null
 
   // SVG viewBox는 500×500 — 도트를 트랙 두께 대비 적절한 크기로
-  const dotRadius = (isUser ? 12 : 9.6) * scale
+  // scale 배율을 무시하여 SVG 로컬 좌표 기준 고정 크기로 렌더링 (헝가로링 비율)
+  const dotRadius = isUser ? 12 : 9.6
   const color = racer.teamColor
 
   return (
@@ -80,27 +81,27 @@ export default function DriverDot({ racer, trackId, svgPath, isUser, pathOffset,
       {/* 유저 강조 글로우 링 */}
       {isUser && (
         <>
-          <circle r={dotRadius + 8.4 * scale} fill="none" stroke="white" strokeWidth={0.72 * scale} opacity={0.2} />
-          <circle r={dotRadius + 4.8 * scale} fill="none" stroke="white" strokeWidth={1.2 * scale} opacity={0.55} />
+          <circle r={dotRadius + 8.4} fill="none" stroke="white" strokeWidth={0.72} opacity={0.2} />
+          <circle r={dotRadius + 4.8} fill="none" stroke="white" strokeWidth={1.2} opacity={0.55} />
         </>
       )}
 
       {/* 메인 점 — 흰 테두리로 모든 섹터 색 위에서 가시성 확보 */}
-      <circle r={dotRadius + 1.8 * scale} fill="white" opacity={0.9} />
+      <circle r={dotRadius + 1.8} fill="white" opacity={0.9} />
       <circle
         r={dotRadius}
         fill={color}
         stroke={isUser ? '#FFFFFF' : 'rgba(255,255,255,0.6)'}
-        strokeWidth={isUser ? 2.4 * scale : 1.2 * scale}
+        strokeWidth={isUser ? 2.4 : 1.2}
       />
 
       {/* 드라이버 코드 라벨 */}
-      <g transform={`translate(${dotRadius + 6 * scale}, ${dotRadius * 0.42}) rotate(${-rotationAngle})`}>
+      <g transform={`translate(${dotRadius + 6}, ${dotRadius * 0.42}) rotate(${-rotationAngle})`}>
         <text
           x={0}
           y={0}
           fill="white"
-          fontSize={12 * scale}
+          fontSize={12}
           fontWeight="bold"
           fontFamily="monospace"
           style={{ pointerEvents: 'none', userSelect: 'none' }}

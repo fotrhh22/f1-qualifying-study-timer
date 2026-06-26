@@ -787,10 +787,11 @@ export default function CalibratePage() {
               <g transform={`rotate(${rotationAngle}, ${cx}, ${cy})`}>
                 
                 {/* Back track outline */}
+                {/* scale 배율을 무시하여 SVG 로컬 좌표 기준 고정 크기로 렌더링 */}
                 <path
                   d={currentTrack.svgPath}
                   stroke="#0C0C0C"
-                  strokeWidth={10 * scale}
+                  strokeWidth={10}
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -801,7 +802,7 @@ export default function CalibratePage() {
                   d={currentTrack.svgPath}
                   pathLength="100"
                   stroke={S1}
-                  strokeWidth={8 * scale}
+                  strokeWidth={8}
                   fill="none"
                   strokeLinecap="butt"
                   strokeLinejoin="round"
@@ -811,7 +812,7 @@ export default function CalibratePage() {
                   d={currentTrack.svgPath}
                   pathLength="100"
                   stroke={S2}
-                  strokeWidth={8 * scale}
+                  strokeWidth={8}
                   fill="none"
                   strokeLinecap="butt"
                   strokeLinejoin="round"
@@ -821,7 +822,7 @@ export default function CalibratePage() {
                   d={currentTrack.svgPath}
                   pathLength="100"
                   stroke={S3}
-                  strokeWidth={8 * scale}
+                  strokeWidth={8}
                   fill="none"
                   strokeLinecap="butt"
                   strokeLinejoin="round"
@@ -832,7 +833,7 @@ export default function CalibratePage() {
                 <path
                   d={currentTrack.svgPath}
                   stroke="#0A0A0A"
-                  strokeWidth={0.8 * scale}
+                  strokeWidth={0.8}
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -978,7 +979,7 @@ export default function CalibratePage() {
   )
 }
 
-function PathStartIndicator({ trackId, svgPath, rotationAngle, scale }: { trackId: string; svgPath: string; rotationAngle: number; scale: number }) {
+function PathStartIndicator({ trackId, svgPath, rotationAngle }: { trackId: string; svgPath: string; rotationAngle: number; scale?: number }) {
   const pt = getPointAtProgress(trackId, svgPath, 0)
   
   // Calculate unrotated center to do the same translation rotation math
@@ -993,9 +994,9 @@ function PathStartIndicator({ trackId, svgPath, rotationAngle, scale }: { trackI
 
   return (
     <g transform={`translate(${rx}, ${ry})`} pointerEvents="none">
-      <circle cx={0} cy={0} r={6 * scale} fill="#00A3E0" stroke="#FFFFFF" strokeWidth={1.2 * scale} />
-      <rect x={8 * scale} y={-8 * scale} width={72 * scale} height={15 * scale} rx={3 * scale} fill="#00A3E0" opacity="0.85" />
-      <text x={12 * scale} y={2 * scale} fill="#FFFFFF" fontSize={7 * scale} fontWeight="bold" fontFamily="sans-serif">
+      <circle cx={0} cy={0} r={6} fill="#00A3E0" stroke="#FFFFFF" strokeWidth={1.2} />
+      <rect x={8} y={-8} width={72} height={15} rx={3} fill="#00A3E0" opacity="0.85" />
+      <text x={12} y={2} fill="#FFFFFF" fontSize={7} fontWeight="bold" fontFamily="sans-serif">
         Path Origin (0.0)
       </text>
     </g>
@@ -1007,13 +1008,12 @@ function StartFinishLine({
   svgPath,
   pathOffset,
   pathOffsetReversed,
-  scale,
 }: {
   trackId: string
   svgPath: string
   pathOffset: number
   pathOffsetReversed?: boolean
-  scale: number
+  scale?: number
 }) {
   const [line, setLine] = useState<{ sx: number; sy: number; ex: number; ey: number } | null>(null)
 
@@ -1025,14 +1025,14 @@ function StartFinishLine({
     const len = Math.sqrt(dx * dx + dy * dy) || 1
     const px = -dy / len
     const py = dx / len
-    const sz = 10 * scale
+    const sz = 10
     setLine({
       sx: p0.x + px * sz,
       sy: p0.y + py * sz,
       ex: p0.x - px * sz,
       ey: p0.y - py * sz,
     })
-  }, [trackId, svgPath, pathOffset, pathOffsetReversed, scale])
+  }, [trackId, svgPath, pathOffset, pathOffsetReversed])
 
   if (!line) return null
 
@@ -1045,7 +1045,7 @@ function StartFinishLine({
         x2={line.ex}
         y2={line.ey}
         stroke="#FFFFFF"
-        strokeWidth={3 * scale}
+        strokeWidth={3}
         strokeLinecap="butt"
       />
       {/* Checkered pattern line */}
@@ -1055,9 +1055,9 @@ function StartFinishLine({
         x2={line.ex}
         y2={line.ey}
         stroke="#000000"
-        strokeWidth={1.5 * scale}
+        strokeWidth={1.5}
         strokeLinecap="butt"
-        strokeDasharray={`${1.5 * scale} ${1.5 * scale}`}
+        strokeDasharray="1.5 1.5"
       />
     </g>
   )
@@ -1070,7 +1070,6 @@ function SectorSplitLine({
   pathOffset,
   pathOffsetReversed,
   color,
-  scale,
 }: {
   trackId: string
   svgPath: string
@@ -1078,7 +1077,7 @@ function SectorSplitLine({
   pathOffset: number
   pathOffsetReversed?: boolean
   color: string
-  scale: number
+  scale?: number
 }) {
   const [line, setLine] = useState<{ sx: number; sy: number; ex: number; ey: number } | null>(null)
 
@@ -1095,14 +1094,14 @@ function SectorSplitLine({
     const len = Math.sqrt(dx * dx + dy * dy) || 1
     const px = -dy / len
     const py = dx / len
-    const sz = 20 * scale
+    const sz = 20
     setLine({
       sx: p0.x + px * sz,
       sy: p0.y + py * sz,
       ex: p0.x - px * sz,
       ey: p0.y - py * sz,
     })
-  }, [trackId, svgPath, splitProgress, pathOffset, pathOffsetReversed, scale])
+  }, [trackId, svgPath, splitProgress, pathOffset, pathOffsetReversed])
 
   if (!line) return null
 
@@ -1115,7 +1114,7 @@ function SectorSplitLine({
         x2={line.ex}
         y2={line.ey}
         stroke={color}
-        strokeWidth={5 * scale}
+        strokeWidth={5}
         strokeLinecap="butt"
       />
       {/* Black dotted inner line */}
@@ -1125,9 +1124,9 @@ function SectorSplitLine({
         x2={line.ex}
         y2={line.ey}
         stroke="#000000"
-        strokeWidth={1.8 * scale}
+        strokeWidth={1.8}
         strokeLinecap="butt"
-        strokeDasharray={`${2 * scale} ${2 * scale}`}
+        strokeDasharray="2 2"
       />
     </g>
   )
@@ -1141,7 +1140,6 @@ function CornerLabels({
   pathOffset,
   pathOffsetReversed,
   rotationAngle,
-  scale,
   cx,
   cy,
   selectedCornerIndex,
@@ -1154,7 +1152,7 @@ function CornerLabels({
   pathOffset: number
   pathOffsetReversed?: boolean
   rotationAngle: number
-  scale: number
+  scale?: number
   cx: number
   cy: number
   selectedCornerIndex?: number | null
@@ -1198,7 +1196,7 @@ function CornerLabels({
 
       // 4. 수직 법선 방향으로 일정 거리 이동 (시각적으로 정렬된 일정한 간격 확보)
       const shiftVal = c.shiftDistance ?? 0
-      const shiftDistance = shiftVal * scale
+      const shiftDistance = shiftVal // SVG 로컬 좌표 기준이므로 scale 적용 제거
       const sx = pt.x + nx * sign * shiftDistance
       const sy = pt.y + ny * sign * shiftDistance
 
@@ -1206,7 +1204,7 @@ function CornerLabels({
       return { sx, sy, label, xOffset: c.xOffset ?? 0, yOffset: c.yOffset ?? 0, index: idx }
     })
     setPositions(pts)
-  }, [trackId, svgPath, lengthKm, corners, pathOffset, pathOffsetReversed, scale, cx, cy])
+  }, [trackId, svgPath, lengthKm, corners, pathOffset, pathOffsetReversed, cx, cy])
 
   const rad = (rotationAngle * Math.PI) / 180
   const cos = Math.cos(rad)
@@ -1220,12 +1218,12 @@ function CornerLabels({
         let ry = cy + (pt.sx - cx) * sin + (pt.sy - cy) * cos
 
         // 화면 기준 상하좌우(X, Y) 개별 오프셋 추가
-        rx += pt.xOffset * scale
-        ry += pt.yOffset * scale
+        rx += pt.xOffset
+        ry += pt.yOffset
 
         const isSelected = selectedCornerIndex === pt.index
         const isTwoDigit = pt.label.length >= 2
-        const r = 12.75 * scale
+        const r = 12.75
         return (
           <g
             key={i}
@@ -1237,7 +1235,7 @@ function CornerLabels({
               r={r}
               fill={isSelected ? '#FFD100' : '#E10600'}
               stroke={isSelected ? '#FFFFFF' : '#FFFFFF'}
-              strokeWidth={(isSelected ? 3.75 : 1.8) * scale}
+              strokeWidth={isSelected ? 3.75 : 1.8}
               style={{ transition: 'fill 0.2s, stroke-width 0.2s' }}
               onClick={(e) => {
                 e.stopPropagation()
@@ -1248,7 +1246,7 @@ function CornerLabels({
             <text
               textAnchor="middle"
               dominantBaseline="central"
-              fontSize={(isTwoDigit ? 8.7 : 10.8) * scale}
+              fontSize={isTwoDigit ? 8.7 : 10.8}
               fill={isSelected ? '#000000' : '#FFFFFF'}
               fontWeight="900"
               fontFamily="sans-serif"
@@ -1261,7 +1259,7 @@ function CornerLabels({
             </text>
             {/* 3. Larger Invisible Hitbox Circle for Easy Click */}
             <circle
-              r={r + 12 * scale}
+              r={r + 12}
               fill="transparent"
               style={{ cursor: 'pointer' }}
               onClick={(e) => {
