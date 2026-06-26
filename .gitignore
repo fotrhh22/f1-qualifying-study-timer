@@ -1,0 +1,27 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# next.js build output
+/.next/
+/out/
+/tsconfig.tsbuildinfo
+
+# Capacitor build outputs (if built in this folder)
+/ios/App/build/
+/ios/App/Pods/
+
+# testing
+/coverage
+
+# misc
+.DS_Store
+*.pem
+.env*.local
+
+# vercel
+.vercel
+
+# claude / agent directories
+.claude/
