@@ -217,7 +217,7 @@ function CornerLabels({
   cy: number
   scale: number
 }) {
-  const [positions, setPositions] = useState<Array<{ x: number; y: number; label: string }>>([])
+  const [positions, setPositions] = useState<Array<{ sx: number; sy: number; label: string; xOffset: number; yOffset: number }>>([])
 
   useEffect(() => {
     // 같은 number가 두 개 이상이면 sub-corner (예: Hungaroring 1/1A)
@@ -232,13 +232,39 @@ function CornerLabels({
       const progress = pathOffsetReversed
         ? (1 - pCorner + pathOffset + 1) % 1
         : (pCorner + pathOffset) % 1
-      const pt = getPointAtProgress(trackId, svgPath, Math.min(progress, 0.999))
-      // sub-corner 있는 트랙: "1A" 형태 / 그 외: 숫자만
+      const progressVal = Math.min(progress, 0.999)
+      const pt = getPointAtProgress(trackId, svgPath, progressVal)
+
+      // 1. 진행 방향 벡터 (Tangent) 계산
+      const progressAhead = (progressVal + 0.002) % 1
+      const ptAhead = getPointAtProgress(trackId, svgPath, progressAhead)
+      const dx = ptAhead.x - pt.x
+      const dy = ptAhead.y - pt.y
+      const len = Math.sqrt(dx * dx + dy * dy) || 1
+      const tx = dx / len
+      const ty = dy / len
+
+      // 2. 법선 벡터 (Normal) 계산 (주행선에 수직)
+      const nx = -ty
+      const ny = tx
+
+      // 3. 서킷 중심(cx, cy)으로부터의 방사형 벡터를 이용해 바깥 방향(Sign) 판별
+      const rx = pt.x - cx
+      const ry = pt.y - cy
+      const dot = nx * rx + ny * ry
+      const sign = dot >= 0 ? 1 : -1
+
+      // 4. 수직 법선 방향으로 일정 거리 이동 (시각적으로 정렬된 일정한 간격 확보)
+      const shiftVal = c.shiftDistance ?? 0
+      const shiftDistance = shiftVal * scale
+      const sx = pt.x + nx * sign * shiftDistance
+      const sy = pt.y + ny * sign * shiftDistance
+
       const label = hasSub && c.letter ? `${c.number}${c.letter}` : `${c.number}`
-      return { x: pt.x, y: pt.y, label }
+      return { sx, sy, label, xOffset: c.xOffset ?? 0, yOffset: c.yOffset ?? 0 }
     })
     setPositions(pts)
-  }, [trackId, svgPath, lengthKm, corners, pathOffset, pathOffsetReversed])
+  }, [trackId, svgPath, lengthKm, corners, pathOffset, pathOffsetReversed, cx, cy, scale])
 
   const rad = (rotationAngle * Math.PI) / 180
   const cos = Math.cos(rad)
@@ -247,9 +273,13 @@ function CornerLabels({
   return (
     <g>
       {positions.map((pt, i) => {
-        // Rotate point around track center (cx, cy)
-        const rx = cx + (pt.x - cx) * cos - (pt.y - cy) * sin
-        const ry = cy + (pt.x - cx) * sin + (pt.y - cy) * cos
+        // Rotate pre-shifted point around track center (cx, cy)
+        let rx = cx + (pt.sx - cx) * cos - (pt.sy - cy) * sin
+        let ry = cy + (pt.sx - cx) * sin + (pt.sy - cy) * cos
+
+        // 화면 기준 상하좌우(X, Y) 개별 오프셋 추가
+        rx += pt.xOffset * scale
+        ry += pt.yOffset * scale
 
         const isTwoDigit = pt.label.length >= 2
         const r = (isTwoDigit ? 6 : 5) * scale

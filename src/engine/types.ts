@@ -48,6 +48,9 @@ export interface CornerData {
   number: number     // 코너 번호 (1-based)
   letter: string     // 복합 코너 구분 ('A', 'B', '' 등)
   length: number     // 스타트라인 기준 누적 거리 (m) — progress 계산용
+  shiftDistance?: number // 수직 법선 오프셋 (기본 0)
+  xOffset?: number       // 화면 기준 수평 X축 오프셋
+  yOffset?: number       // 화면 기준 수직 Y축 오프셋
 }
 
 export interface TrackData {

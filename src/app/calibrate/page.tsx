@@ -36,6 +36,15 @@ export default function CalibratePage() {
     )
   })
 
+  // 개별 코너 보정 관련 상태
+  const [selectedCornerIndex, setSelectedCornerIndex] = useState<number | null>(null)
+  const [calibratedCorners, setCalibratedCorners] = useState<Record<string, Record<number, { lengthOffset: number; shiftDistance: number; xOffset: number; yOffset: number }>>>({})
+
+  // 서킷이 변경되면 선택된 코너 해제
+  useEffect(() => {
+    setSelectedCornerIndex(null)
+  }, [selectedTrackId])
+
   const currentTrack = TRACKS.find((t) => t.id === selectedTrackId)!
   const { pathOffset, pathOffsetReversed, sector1Progress, sector2Progress, rotationAngle } = calibratedTracks[selectedTrackId] || { 
     pathOffset: 0, 
@@ -44,6 +53,19 @@ export default function CalibratePage() {
     sector2Progress: 0.666,
     rotationAngle: 0
   }
+
+  // 병합된 코너 데이터 (기본 corners + 사용자 캘리브레이션 오프셋 적용)
+  const defaultCorners = CORNERS[currentTrack.id] || []
+  const mergedCorners = defaultCorners.map((c, idx) => {
+    const override = calibratedCorners[currentTrack.id]?.[idx]
+    return {
+      ...c,
+      length: parseFloat((c.length + (override?.lengthOffset ?? 0)).toFixed(2)),
+      shiftDistance: override?.shiftDistance ?? 0,
+      xOffset: override?.xOffset ?? 0,
+      yOffset: override?.yOffset ?? 0
+    }
+  })
 
   const [samples, setSamples] = useState<Array<{ x: number; y: number; progress: number }>>([])
   const [hoveredPt, setHoveredPt] = useState<{ x: number; y: number; progress: number } | null>(null)
@@ -59,6 +81,36 @@ export default function CalibratePage() {
         ...updates,
       },
     }))
+  }
+
+  // 개별 코너 상태 업데이트 핸들러
+  const updateCornerCalib = (idx: number, updates: Partial<{ lengthOffset: number; shiftDistance: number; xOffset: number; yOffset: number }>) => {
+    setCalibratedCorners((prev) => {
+      const trackOverride = prev[selectedTrackId] || {}
+      const cornerOverride = trackOverride[idx] || { lengthOffset: 0, shiftDistance: 0, xOffset: 0, yOffset: 0 }
+      return {
+        ...prev,
+        [selectedTrackId]: {
+          ...trackOverride,
+          [idx]: {
+            ...cornerOverride,
+            ...updates
+          }
+        }
+      }
+    })
+  }
+
+  const resetSelectedCorner = () => {
+    if (selectedCornerIndex === null) return
+    setCalibratedCorners((prev) => {
+      const trackOverride = { ...(prev[selectedTrackId] || {}) }
+      delete trackOverride[selectedCornerIndex]
+      return {
+        ...prev,
+        [selectedTrackId]: trackOverride
+      }
+    })
   }
 
   // Pre-generate 1000 sample points along the track path when selected track changes
@@ -157,6 +209,18 @@ export default function CalibratePage() {
         minDistance = dist
         closestProgress = sample.progress
       }
+    }
+
+    if (selectedCornerIndex !== null) {
+      const corner = defaultCorners[selectedCornerIndex]
+      if (corner) {
+        const relProgress = pathOffsetReversed
+          ? (pathOffset - closestProgress + 1) % 1
+          : (closestProgress - pathOffset + 1) % 1
+        const targetLength = relProgress * (currentTrack.lengthKm * 10000)
+        updateCornerCalib(selectedCornerIndex, { lengthOffset: parseFloat((targetLength - corner.length).toFixed(2)) })
+      }
+      return
     }
 
     if (calibMode === 'start') {
@@ -258,6 +322,20 @@ export default function CalibratePage() {
     alert('Calibration JSON copied to clipboard!')
   }
 
+  const copyCornersToClipboard = () => {
+    // 깔끔한 JSON 출력을 위해 xOffset, yOffset이 0이거나 shiftDistance가 0인 기본값들은 저장하지 않고 출력해도 무방하지만,
+    // corners.ts의 본래 구조를 그대로 업데이트하기 위해 mergedCorners 배열을 통째로 직렬화합니다.
+    const cleanCorners = mergedCorners.map((c) => {
+      const item: any = { number: c.number, letter: c.letter, length: c.length }
+      if (c.shiftDistance !== 0) item.shiftDistance = c.shiftDistance
+      if (c.xOffset !== 0) item.xOffset = c.xOffset
+      if (c.yOffset !== 0) item.yOffset = c.yOffset
+      return item
+    })
+    navigator.clipboard.writeText(JSON.stringify(cleanCorners, null, 2))
+    alert(`Copied ${currentTrack.name} Corners JSON to clipboard!`)
+  }
+
   // Helper to calculate SVG dash properties for sectors
   const getSectorDashProps = (startProgress: number, length: number) => {
     const A = ((startProgress % 100) + 100) % 100
@@ -302,13 +380,19 @@ export default function CalibratePage() {
         <div className="flex gap-3">
           <button
             onClick={handleResetCurrent}
-            className="px-5 py-2 bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs rounded-lg uppercase tracking-wider transition-colors border border-gray-700"
+            className="px-5 py-2 bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs rounded-lg uppercase tracking-wider transition-colors border border-gray-700 cursor-pointer"
           >
             Reset Current
           </button>
           <button
+            onClick={copyCornersToClipboard}
+            className="px-5 py-2 bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs rounded-lg uppercase tracking-wider transition-colors border border-gray-700 cursor-pointer"
+          >
+            Copy Corners JSON
+          </button>
+          <button
             onClick={copyToClipboard}
-            className="px-6 py-2 bg-[#E10600] hover:bg-[#FF1800] text-white font-bold text-xs rounded-lg uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(225,6,0,0.3)]"
+            className="px-6 py-2 bg-[#E10600] hover:bg-[#FF1800] text-white font-bold text-xs rounded-lg uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(225,6,0,0.3)] cursor-pointer"
           >
             Copy JSON Output
           </button>
@@ -506,6 +590,140 @@ export default function CalibratePage() {
                 className="w-4 h-4 accent-[#E10600] rounded cursor-pointer"
               />
             </div>
+
+            {/* Corner Calibration Panel */}
+            <div className="border-t border-gray-800 pt-3 flex flex-col gap-2">
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Corner Calibration</h3>
+              
+              {selectedCornerIndex === null ? (
+                <span className="text-[10px] text-gray-500 italic">
+                  Click a corner dot on the map to calibrate individual corners.
+                </span>
+              ) : (() => {
+                const corner = defaultCorners[selectedCornerIndex]
+                if (!corner) return null
+                const override = calibratedCorners[selectedTrackId]?.[selectedCornerIndex] || {
+                  lengthOffset: 0,
+                  shiftDistance: 0,
+                  xOffset: 0,
+                  yOffset: 0
+                }
+                const isModified = override.lengthOffset !== 0 || override.shiftDistance !== 0 || override.xOffset !== 0 || override.yOffset !== 0
+
+                const hasSub = defaultCorners.filter(c => c.number === corner.number).length > 1
+                const labelName = hasSub && corner.letter ? `Turn ${corner.number}${corner.letter}` : `Turn ${corner.number}`
+
+                return (
+                  <div className="flex flex-col gap-3.5 bg-[#1A1C2C] p-3 rounded-lg border border-gray-800/80">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-white uppercase">{labelName}</span>
+                      <div className="flex gap-1.5">
+                        {isModified && (
+                          <button
+                            onClick={resetSelectedCorner}
+                            className="px-1.5 py-0.5 rounded text-[8px] font-bold uppercase bg-red-950 text-red-400 border border-red-800/80 cursor-pointer"
+                          >
+                            Reset
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setSelectedCornerIndex(null)}
+                          className="px-1.5 py-0.5 rounded text-[8px] font-bold uppercase bg-gray-800 text-gray-400 hover:text-white border border-gray-700 cursor-pointer"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Position along Track Slider */}
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[9px] font-bold text-gray-400 uppercase">Track Pos (Length)</span>
+                        <span className="text-[9px] font-mono font-bold text-gray-300">
+                          {parseFloat((corner.length + override.lengthOffset).toFixed(1))} dm
+                          {override.lengthOffset !== 0 && (
+                            <span className="text-red-500 ml-1">
+                              ({override.lengthOffset > 0 ? '+' : ''}{override.lengthOffset})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="-3000"
+                        max="3000"
+                        step="10"
+                        value={override.lengthOffset}
+                        onChange={(e) => updateCornerCalib(selectedCornerIndex, { lengthOffset: parseFloat(e.target.value) || 0 })}
+                        className="w-full accent-[#E10600] h-1 cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Perpendicular Offset Slider */}
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[9px] font-bold text-gray-400 uppercase">Perp Offset</span>
+                        <span className="text-[9px] font-mono font-bold text-gray-300">
+                          {override.shiftDistance}
+                          {override.shiftDistance !== 0 && (
+                            <span className="text-red-500 ml-1">
+                              ({override.shiftDistance > 0 ? '+' : ''}{override.shiftDistance})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="-30"
+                        max="30"
+                        step="1"
+                        value={override.shiftDistance}
+                        onChange={(e) => updateCornerCalib(selectedCornerIndex, { shiftDistance: parseInt(e.target.value) || 0 })}
+                        className="w-full accent-[#E10600] h-1 cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Screen X Offset Slider */}
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[9px] font-bold text-gray-400 uppercase">Screen X (Left/Right)</span>
+                        <span className="text-[9px] font-mono font-bold text-gray-300">
+                          {override.xOffset > 0 ? '+' : ''}{override.xOffset} px
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="-50"
+                        max="50"
+                        step="1"
+                        value={override.xOffset}
+                        onChange={(e) => updateCornerCalib(selectedCornerIndex, { xOffset: parseInt(e.target.value) || 0 })}
+                        className="w-full accent-[#E10600] h-1 cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Screen Y Offset Slider */}
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[9px] font-bold text-gray-400 uppercase">Screen Y (Up/Down)</span>
+                        <span className="text-[9px] font-mono font-bold text-gray-300">
+                          {override.yOffset > 0 ? '+' : ''}{override.yOffset} px
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="-50"
+                        max="50"
+                        step="1"
+                        value={override.yOffset}
+                        onChange={(e) => updateCornerCalib(selectedCornerIndex, { yOffset: parseInt(e.target.value) || 0 })}
+                        className="w-full accent-[#E10600] h-1 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                )
+              })()}
+            </div>
           </div>
 
           {/* Checklist of Tracks */}
@@ -661,16 +879,20 @@ export default function CalibratePage() {
                 trackId={currentTrack.id}
                 svgPath={currentTrack.svgPath}
                 lengthKm={currentTrack.lengthKm}
-                corners={CORNERS[currentTrack.id] || []}
+                corners={mergedCorners}
                 pathOffset={pathOffset}
                 pathOffsetReversed={pathOffsetReversed}
                 rotationAngle={rotationAngle}
                 scale={scale}
+                cx={cx}
+                cy={cy}
+                selectedCornerIndex={selectedCornerIndex}
+                onSelectCorner={setSelectedCornerIndex}
               />
 
               {/* Snapped hovered point (needs to be drawn in rotated coordinates) */}
               {hoveredPt && (
-                <g>
+                <g pointerEvents="none">
                   <circle
                     cx={hoveredPt.x}
                     cy={hoveredPt.y}
@@ -770,7 +992,7 @@ function PathStartIndicator({ trackId, svgPath, rotationAngle, scale }: { trackI
   const ry = cy + (pt.x - cx) * sin + (pt.y - cy) * cos
 
   return (
-    <g transform={`translate(${rx}, ${ry})`}>
+    <g transform={`translate(${rx}, ${ry})`} pointerEvents="none">
       <circle cx={0} cy={0} r={6 * scale} fill="#00A3E0" stroke="#FFFFFF" strokeWidth={1.2 * scale} />
       <rect x={8 * scale} y={-8 * scale} width={72 * scale} height={15 * scale} rx={3 * scale} fill="#00A3E0" opacity="0.85" />
       <text x={12 * scale} y={2 * scale} fill="#FFFFFF" fontSize={7 * scale} fontWeight="bold" fontFamily="sans-serif">
@@ -815,7 +1037,7 @@ function StartFinishLine({
   if (!line) return null
 
   return (
-    <g>
+    <g pointerEvents="none">
       {/* Glowing boundary */}
       <line
         x1={line.sx}
@@ -885,7 +1107,7 @@ function SectorSplitLine({
   if (!line) return null
 
   return (
-    <g>
+    <g pointerEvents="none">
       {/* Glow boundary */}
       <line
         x1={line.sx}
@@ -920,6 +1142,10 @@ function CornerLabels({
   pathOffsetReversed,
   rotationAngle,
   scale,
+  cx,
+  cy,
+  selectedCornerIndex,
+  onSelectCorner,
 }: {
   trackId: string
   svgPath: string
@@ -929,8 +1155,12 @@ function CornerLabels({
   pathOffsetReversed?: boolean
   rotationAngle: number
   scale: number
+  cx: number
+  cy: number
+  selectedCornerIndex?: number | null
+  onSelectCorner?: (index: number) => void
 }) {
-  const [positions, setPositions] = useState<Array<{ x: number; y: number; label: string }>>([])
+  const [positions, setPositions] = useState<Array<{ sx: number; sy: number; label: string; xOffset: number; yOffset: number; index: number }>>([])
 
   useEffect(() => {
     const numCount = corners.reduce<Record<number, number>>((acc, c) => {
@@ -939,20 +1169,45 @@ function CornerLabels({
     }, {})
     const hasSub = Object.values(numCount).some((v) => v > 1)
 
-    const pts = corners.map((c) => {
+    const pts = corners.map((c, idx) => {
       const pCorner = c.length / (lengthKm * 10000)
       const progress = pathOffsetReversed
         ? (1 - pCorner + pathOffset + 1) % 1
         : (pCorner + pathOffset) % 1
-      const pt = getPointAtProgress(trackId, svgPath, Math.min(progress, 0.999))
+      const progressVal = Math.min(progress, 0.999)
+      const pt = getPointAtProgress(trackId, svgPath, progressVal)
+
+      // 1. 진행 방향 벡터 (Tangent) 계산
+      const progressAhead = (progressVal + 0.002) % 1
+      const ptAhead = getPointAtProgress(trackId, svgPath, progressAhead)
+      const dx = ptAhead.x - pt.x
+      const dy = ptAhead.y - pt.y
+      const len = Math.sqrt(dx * dx + dy * dy) || 1
+      const tx = dx / len
+      const ty = dy / len
+
+      // 2. 법선 벡터 (Normal) 계산 (주행선에 수직)
+      const nx = -ty
+      const ny = tx
+
+      // 3. 서킷 중심(cx, cy)으로부터의 방사형 벡터를 이용해 바깥 방향(Sign) 판별
+      const rx = pt.x - cx
+      const ry = pt.y - cy
+      const dot = nx * rx + ny * ry
+      const sign = dot >= 0 ? 1 : -1
+
+      // 4. 수직 법선 방향으로 일정 거리 이동 (시각적으로 정렬된 일정한 간격 확보)
+      const shiftVal = c.shiftDistance ?? 0
+      const shiftDistance = shiftVal * scale
+      const sx = pt.x + nx * sign * shiftDistance
+      const sy = pt.y + ny * sign * shiftDistance
+
       const label = hasSub && c.letter ? `${c.number}${c.letter}` : `${c.number}`
-      return { x: pt.x, y: pt.y, label }
+      return { sx, sy, label, xOffset: c.xOffset ?? 0, yOffset: c.yOffset ?? 0, index: idx }
     })
     setPositions(pts)
-  }, [trackId, svgPath, lengthKm, corners, pathOffset, pathOffsetReversed])
+  }, [trackId, svgPath, lengthKm, corners, pathOffset, pathOffsetReversed, scale, cx, cy])
 
-  // Estimating center for rotation math (center of 500x500 space is 250, 250)
-  const cx = 250, cy = 250
   const rad = (rotationAngle * Math.PI) / 180
   const cos = Math.cos(rad)
   const sin = Math.sin(rad)
@@ -960,25 +1215,60 @@ function CornerLabels({
   return (
     <g>
       {positions.map((pt, i) => {
-        // Calculate the rotated coordinate of the corner so we can translate and counter-rotate it
-        const rx = cx + (pt.x - cx) * cos - (pt.y - cy) * sin
-        const ry = cy + (pt.x - cx) * sin + (pt.y - cy) * cos
+        // Rotate pre-shifted point around track center (cx, cy)
+        let rx = cx + (pt.sx - cx) * cos - (pt.sy - cy) * sin
+        let ry = cy + (pt.sx - cx) * sin + (pt.sy - cy) * cos
 
+        // 화면 기준 상하좌우(X, Y) 개별 오프셋 추가
+        rx += pt.xOffset * scale
+        ry += pt.yOffset * scale
+
+        const isSelected = selectedCornerIndex === pt.index
         const isTwoDigit = pt.label.length >= 2
         const r = (isTwoDigit ? 8.5 : 7.5) * scale
         return (
-          <g key={i} transform={`translate(${rx}, ${ry})`}>
-            <circle r={r} fill="#E10600" stroke="#FFFFFF" strokeWidth={1.2 * scale} />
+          <g
+            key={i}
+            transform={`translate(${rx}, ${ry})`}
+            style={{ cursor: 'pointer' }}
+          >
+            {/* 1. Visible Badge Circle */}
+            <circle
+              r={r}
+              fill={isSelected ? '#FFD100' : '#E10600'}
+              stroke={isSelected ? '#FFFFFF' : '#FFFFFF'}
+              strokeWidth={(isSelected ? 2.5 : 1.2) * scale}
+              style={{ transition: 'fill 0.2s, stroke-width 0.2s' }}
+              onClick={(e) => {
+                e.stopPropagation()
+                onSelectCorner?.(pt.index)
+              }}
+            />
+            {/* 2. Text Label */}
             <text
               textAnchor="middle"
               dominantBaseline="central"
               fontSize={(isTwoDigit ? 5.8 : 7.2) * scale}
-              fill="#FFFFFF"
+              fill={isSelected ? '#000000' : '#FFFFFF'}
               fontWeight="900"
               fontFamily="sans-serif"
+              onClick={(e) => {
+                e.stopPropagation()
+                onSelectCorner?.(pt.index)
+              }}
             >
               {pt.label}
             </text>
+            {/* 3. Larger Invisible Hitbox Circle for Easy Click */}
+            <circle
+              r={r + 12 * scale}
+              fill="transparent"
+              style={{ cursor: 'pointer' }}
+              onClick={(e) => {
+                e.stopPropagation()
+                onSelectCorner?.(pt.index)
+              }}
+            />
           </g>
         )
       })}
