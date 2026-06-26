@@ -1225,7 +1225,7 @@ function CornerLabels({
 
         const isSelected = selectedCornerIndex === pt.index
         const isTwoDigit = pt.label.length >= 2
-        const r = (isTwoDigit ? 12.75 : 11.25) * scale
+        const r = 12.75 * scale
         return (
           <g
             key={i}

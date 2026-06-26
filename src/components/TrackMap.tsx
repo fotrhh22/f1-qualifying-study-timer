@@ -282,7 +282,7 @@ function CornerLabels({
         ry += pt.yOffset * scale
 
         const isTwoDigit = pt.label.length >= 2
-        const r = (isTwoDigit ? 9 : 7.5) * scale
+        const r = 9 * scale
         return (
           <g key={i} transform={`translate(${rx},${ry})`}>
             <circle r={r} fill="rgba(8,9,20,0.82)" stroke="rgba(255,255,255,0.38)" strokeWidth={1.35 * scale} />
