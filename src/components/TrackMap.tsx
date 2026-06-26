@@ -282,14 +282,14 @@ function CornerLabels({
         ry += pt.yOffset * scale
 
         const isTwoDigit = pt.label.length >= 2
-        const r = (isTwoDigit ? 6 : 5) * scale
+        const r = (isTwoDigit ? 9 : 7.5) * scale
         return (
           <g key={i} transform={`translate(${rx},${ry})`}>
-            <circle r={r} fill="rgba(8,9,20,0.82)" stroke="rgba(255,255,255,0.38)" strokeWidth={0.9 * scale} />
+            <circle r={r} fill="rgba(8,9,20,0.82)" stroke="rgba(255,255,255,0.38)" strokeWidth={1.35 * scale} />
             <text
               textAnchor="middle"
               dominantBaseline="central"
-              fontSize={(isTwoDigit ? 3.8 : 4.5) * scale}
+              fontSize={(isTwoDigit ? 5.7 : 6.75) * scale}
               fill="rgba(255,255,255,0.85)"
               fontWeight="700"
               fontFamily="'Arial', sans-serif"

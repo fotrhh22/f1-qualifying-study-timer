@@ -1225,7 +1225,7 @@ function CornerLabels({
 
         const isSelected = selectedCornerIndex === pt.index
         const isTwoDigit = pt.label.length >= 2
-        const r = (isTwoDigit ? 8.5 : 7.5) * scale
+        const r = (isTwoDigit ? 12.75 : 11.25) * scale
         return (
           <g
             key={i}
@@ -1237,7 +1237,7 @@ function CornerLabels({
               r={r}
               fill={isSelected ? '#FFD100' : '#E10600'}
               stroke={isSelected ? '#FFFFFF' : '#FFFFFF'}
-              strokeWidth={(isSelected ? 2.5 : 1.2) * scale}
+              strokeWidth={(isSelected ? 3.75 : 1.8) * scale}
               style={{ transition: 'fill 0.2s, stroke-width 0.2s' }}
               onClick={(e) => {
                 e.stopPropagation()
@@ -1248,7 +1248,7 @@ function CornerLabels({
             <text
               textAnchor="middle"
               dominantBaseline="central"
-              fontSize={(isTwoDigit ? 5.8 : 7.2) * scale}
+              fontSize={(isTwoDigit ? 8.7 : 10.8) * scale}
               fill={isSelected ? '#000000' : '#FFFFFF'}
               fontWeight="900"
               fontFamily="sans-serif"
