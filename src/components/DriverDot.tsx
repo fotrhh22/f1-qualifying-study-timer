@@ -68,7 +68,8 @@ export default function DriverDot({ racer, trackId, svgPath, isUser, pathOffset,
 
   // SVG viewBox는 500×500 — 도트를 트랙 두께 대비 적절한 크기로
   // scale 배율을 무시하여 SVG 로컬 좌표 기준 고정 크기로 렌더링 (헝가로링 비율)
-  const dotRadius = isUser ? 12 : 9.6
+  // 유저와 NPC 모두 고정 반지름 9.6 사용
+  const dotRadius = 9.6
   const color = racer.teamColor
 
   return (
