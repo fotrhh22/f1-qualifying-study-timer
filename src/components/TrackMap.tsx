@@ -128,16 +128,16 @@ export default function TrackMap() {
         {/* Rotation Group wrapper */}
         <g transform={`rotate(${rotAngle}, ${bounds.cx}, ${bounds.cy})`}>
           {/* ── 트랙 레이어 ── */}
-          {/* 외곽 검정 테두리: colored(18) 대비 2px씩만 넓혀 겹침 방지 */}
-          <path d={p} stroke="#0C0C0C" strokeWidth={22 * scale} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          {/* 외곽 검정 테두리: colored(8) 대비 2px씩만 넓혀 겹침 방지 */}
+          <path d={p} stroke="#0C0C0C" strokeWidth={10 * scale} fill="none" strokeLinecap="round" strokeLinejoin="round" />
 
           {/* 섹터 컬러 (pathLength 정규화) */}
-          <path d={p} pathLength="100" stroke={S1} strokeWidth={18 * scale} fill="none" strokeLinecap="butt" strokeLinejoin="round" {...s1Props} />
-          <path d={p} pathLength="100" stroke={S2} strokeWidth={18 * scale} fill="none" strokeLinecap="butt" strokeLinejoin="round" {...s2Props} />
-          <path d={p} pathLength="100" stroke={S3} strokeWidth={18 * scale} fill="none" strokeLinecap="butt" strokeLinejoin="round" {...s3Props} />
+          <path d={p} pathLength="100" stroke={S1} strokeWidth={8 * scale} fill="none" strokeLinecap="butt" strokeLinejoin="round" {...s1Props} />
+          <path d={p} pathLength="100" stroke={S2} strokeWidth={8 * scale} fill="none" strokeLinecap="butt" strokeLinejoin="round" {...s2Props} />
+          <path d={p} pathLength="100" stroke={S3} strokeWidth={8 * scale} fill="none" strokeLinecap="butt" strokeLinejoin="round" {...s3Props} />
 
           {/* 중앙 진한 선 */}
-          <path d={p} stroke="#0A0A0A" strokeWidth={2 * scale} fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
+          <path d={p} stroke="#0A0A0A" strokeWidth={0.8 * scale} fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
 
           {/* ── 시작/종료 라인 ── */}
           <StartFinishLine trackId={track.id} svgPath={p} pathOffset={offset} pathOffsetReversed={isRev} scale={scale} />
@@ -254,7 +254,7 @@ function CornerLabels({
         const isTwoDigit = pt.label.length >= 2
         const r = (isTwoDigit ? 6 : 5) * scale
         return (
-          <g key={i} transform={`translate(${rx},${ry}) rotate(${-rotationAngle})`}>
+          <g key={i} transform={`translate(${rx},${ry})`}>
             <circle r={r} fill="rgba(8,9,20,0.82)" stroke="rgba(255,255,255,0.38)" strokeWidth={0.9 * scale} />
             <text
               textAnchor="middle"
@@ -291,7 +291,7 @@ function StartFinishLine({
     const dx = p1.x - p0.x, dy = p1.y - p0.y
     const len = Math.sqrt(dx * dx + dy * dy) || 1
     const px = -dy / len, py = dx / len
-    const sz = 22 * scale
+    const sz = 10 * scale
     setLine({ sx: p0.x + px * sz, sy: p0.y + py * sz, ex: p0.x - px * sz, ey: p0.y - py * sz })
   }, [trackId, svgPath, pathOffset, scale])
 
@@ -300,9 +300,9 @@ function StartFinishLine({
   return (
     <g>
       <line x1={line.sx} y1={line.sy} x2={line.ex} y2={line.ey}
-        stroke="#FFFFFF" strokeWidth={6 * scale} strokeLinecap="butt" />
+        stroke="#FFFFFF" strokeWidth={3 * scale} strokeLinecap="butt" />
       <line x1={line.sx} y1={line.sy} x2={line.ex} y2={line.ey}
-        stroke="#000000" strokeWidth={2 * scale} strokeLinecap="butt" strokeDasharray="3 3" />
+        stroke="#000000" strokeWidth={1 * scale} strokeLinecap="butt" strokeDasharray="3 3" />
     </g>
   )
 }

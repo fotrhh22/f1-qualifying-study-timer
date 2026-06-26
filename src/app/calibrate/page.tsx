@@ -572,7 +572,7 @@ export default function CalibratePage() {
                 <path
                   d={currentTrack.svgPath}
                   stroke="#0C0C0C"
-                  strokeWidth={22 * scale}
+                  strokeWidth={10 * scale}
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -583,7 +583,7 @@ export default function CalibratePage() {
                   d={currentTrack.svgPath}
                   pathLength="100"
                   stroke={S1}
-                  strokeWidth={18 * scale}
+                  strokeWidth={8 * scale}
                   fill="none"
                   strokeLinecap="butt"
                   strokeLinejoin="round"
@@ -593,7 +593,7 @@ export default function CalibratePage() {
                   d={currentTrack.svgPath}
                   pathLength="100"
                   stroke={S2}
-                  strokeWidth={18 * scale}
+                  strokeWidth={8 * scale}
                   fill="none"
                   strokeLinecap="butt"
                   strokeLinejoin="round"
@@ -603,7 +603,7 @@ export default function CalibratePage() {
                   d={currentTrack.svgPath}
                   pathLength="100"
                   stroke={S3}
-                  strokeWidth={18 * scale}
+                  strokeWidth={8 * scale}
                   fill="none"
                   strokeLinecap="butt"
                   strokeLinejoin="round"
@@ -614,7 +614,7 @@ export default function CalibratePage() {
                 <path
                   d={currentTrack.svgPath}
                   stroke="#0A0A0A"
-                  strokeWidth={2 * scale}
+                  strokeWidth={0.8 * scale}
                   fill="none"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -770,7 +770,7 @@ function PathStartIndicator({ trackId, svgPath, rotationAngle, scale }: { trackI
   const ry = cy + (pt.x - cx) * sin + (pt.y - cy) * cos
 
   return (
-    <g transform={`translate(${rx}, ${ry}) rotate(${-rotationAngle})`}>
+    <g transform={`translate(${rx}, ${ry})`}>
       <circle cx={0} cy={0} r={6 * scale} fill="#00A3E0" stroke="#FFFFFF" strokeWidth={1.2 * scale} />
       <rect x={8 * scale} y={-8 * scale} width={72 * scale} height={15 * scale} rx={3 * scale} fill="#00A3E0" opacity="0.85" />
       <text x={12 * scale} y={2 * scale} fill="#FFFFFF" fontSize={7 * scale} fontWeight="bold" fontFamily="sans-serif">
@@ -803,7 +803,7 @@ function StartFinishLine({
     const len = Math.sqrt(dx * dx + dy * dy) || 1
     const px = -dy / len
     const py = dx / len
-    const sz = 22 * scale
+    const sz = 10 * scale
     setLine({
       sx: p0.x + px * sz,
       sy: p0.y + py * sz,
@@ -823,7 +823,7 @@ function StartFinishLine({
         x2={line.ex}
         y2={line.ey}
         stroke="#FFFFFF"
-        strokeWidth={7 * scale}
+        strokeWidth={3 * scale}
         strokeLinecap="butt"
       />
       {/* Checkered pattern line */}
@@ -833,9 +833,9 @@ function StartFinishLine({
         x2={line.ex}
         y2={line.ey}
         stroke="#000000"
-        strokeWidth={3.5 * scale}
+        strokeWidth={1.5 * scale}
         strokeLinecap="butt"
-        strokeDasharray={`${4 * scale} ${4 * scale}`}
+        strokeDasharray={`${1.5 * scale} ${1.5 * scale}`}
       />
     </g>
   )
@@ -967,7 +967,7 @@ function CornerLabels({
         const isTwoDigit = pt.label.length >= 2
         const r = (isTwoDigit ? 8.5 : 7.5) * scale
         return (
-          <g key={i} transform={`translate(${rx}, ${ry}) rotate(${-rotationAngle})`}>
+          <g key={i} transform={`translate(${rx}, ${ry})`}>
             <circle r={r} fill="#E10600" stroke="#FFFFFF" strokeWidth={1.2 * scale} />
             <text
               textAnchor="middle"
