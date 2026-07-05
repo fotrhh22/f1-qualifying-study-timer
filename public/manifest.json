@@ -1,6 +1,6 @@
 {
-  "name": "F1 Qualifying Study Timer",
-  "short_name": "F1 Study",
+  "name": "F1 Study Timer",
+  "short_name": "F1",
   "description": "공부 타이머를 F1 퀄리파잉으로 시각화",
   "start_url": "/",
   "display": "fullscreen",

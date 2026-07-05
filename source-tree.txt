@@ -1,0 +1,314 @@
+.
+├── .claude
+│   └── settings.local.json
+├── .DS_Store
+├── .gitignore
+├── AGENTS.md
+├── capacitor.config.ts
+├── claude.md
+├── image
+│   ├── 2026alpinefracol01right.avif
+│   ├── 2026alpinelogo.avif
+│   ├── 2026alpinepiegas01right.avif
+│   ├── 2026astonmartinferalo01right.avif
+│   ├── 2026astonmartinlanstr01right.avif
+│   ├── 2026astonmartinlogo.avif
+│   ├── 2026audigabbor01right.avif
+│   ├── 2026audilogo.avif
+│   ├── 2026audinichul01right.avif
+│   ├── 2026cadillaclogo.avif
+│   ├── 2026cadillacserper01right.avif
+│   ├── 2026cadillacvalbot01right.avif
+│   ├── 2026ferrarichalec01right.avif
+│   ├── 2026ferrarilewham01right.avif
+│   ├── 2026ferrarilogo.avif
+│   ├── 2026haasf1teamestoco01right.avif
+│   ├── 2026haasf1teamolibea01right.avif
+│   ├── 2026haaslogo.avif
+│   ├── 2026mclarenlannor01right.avif
+│   ├── 2026mclarenlogo.avif
+│   ├── 2026mclarenoscpia01right.avif
+│   ├── 2026mercedesandant01right.avif
+│   ├── 2026mercedesgeorus01right.avif
+│   ├── 2026mercedeslogo.avif
+│   ├── 2026racingbullsarvlin01right.avif
+│   ├── 2026racingbullslialaw01right.avif
+│   ├── 2026racingbullslogo.avif
+│   ├── 2026redbullracingisahad01right.avif
+│   ├── 2026redbullracinglogo.avif
+│   ├── 2026redbullracingmaxver01right.avif
+│   ├── 2026williamsalealb01right.avif
+│   ├── 2026williamscarsai01right.avif
+│   └── 2026williamslogo.avif
+├── ios
+│   ├── .gitignore
+│   ├── App
+│   │   ├── App
+│   │   │   ├── App-Bridging-Header.h
+│   │   │   ├── AppDelegate.swift
+│   │   │   ├── Assets.xcassets
+│   │   │   ├── Base.lproj
+│   │   │   ├── capacitor.config.json
+│   │   │   ├── config.xml
+│   │   │   ├── F1LiveActivityPlugin.m
+│   │   │   ├── F1LiveActivityPlugin.swift
+│   │   │   ├── Info.plist
+│   │   │   └── public
+│   │   ├── App.xcodeproj
+│   │   │   ├── project.pbxproj
+│   │   │   ├── project.xcworkspace
+│   │   │   └── xcuserdata
+│   │   ├── CapApp-SPM
+│   │   │   ├── .gitignore
+│   │   │   ├── .swiftpm
+│   │   │   ├── Package.swift
+│   │   │   ├── README.md
+│   │   │   └── Sources
+│   │   └── F1TimerWidget
+│   │       ├── Assets.xcassets
+│   │       ├── F1TimerWidget.swift
+│   │       └── Info.plist
+│   ├── capacitor-cordova-ios-plugins
+│   │   ├── CordovaPluginsResources.podspec
+│   │   ├── resources
+│   │   │   └── .gitkeep
+│   │   └── sources
+│   │       └── .gitkeep
+│   └── debug.xcconfig
+├── next-env.d.ts
+├── next.config.ts
+├── out
+│   ├── _next
+│   │   ├── L4qIF_mvZWC15bSF4wkkO
+│   │   └── static
+│   │       ├── chunks
+│   │       ├── css
+│   │       └── L4qIF_mvZWC15bSF4wkkO
+│   ├── 404
+│   │   └── index.html
+│   ├── 404.html
+│   ├── calibrate
+│   │   ├── index.html
+│   │   └── index.txt
+│   ├── favicon.ico
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── icons
+│   ├── image
+│   │   ├── 2026alpinefracol01right.avif
+│   │   ├── 2026alpinefracol01right.png
+│   │   ├── 2026alpinelogo.avif
+│   │   ├── 2026alpinelogo.png
+│   │   ├── 2026alpinepiegas01right.avif
+│   │   ├── 2026alpinepiegas01right.png
+│   │   ├── 2026astonmartinferalo01right.avif
+│   │   ├── 2026astonmartinferalo01right.png
+│   │   ├── 2026astonmartinlanstr01right.avif
+│   │   ├── 2026astonmartinlanstr01right.png
+│   │   ├── 2026astonmartinlogo.avif
+│   │   ├── 2026astonmartinlogo.png
+│   │   ├── 2026audigabbor01right.avif
+│   │   ├── 2026audigabbor01right.png
+│   │   ├── 2026audilogo.avif
+│   │   ├── 2026audilogo.png
+│   │   ├── 2026audinichul01right.avif
+│   │   ├── 2026audinichul01right.png
+│   │   ├── 2026cadillaclogo.avif
+│   │   ├── 2026cadillaclogo.png
+│   │   ├── 2026cadillacserper01right.avif
+│   │   ├── 2026cadillacserper01right.png
+│   │   ├── 2026cadillacvalbot01right.avif
+│   │   ├── 2026cadillacvalbot01right.png
+│   │   ├── 2026ferrarichalec01right.avif
+│   │   ├── 2026ferrarichalec01right.png
+│   │   ├── 2026ferrarilewham01right.avif
+│   │   ├── 2026ferrarilewham01right.png
+│   │   ├── 2026ferrarilogo.avif
+│   │   ├── 2026ferrarilogo.png
+│   │   ├── 2026haasf1teamestoco01right.avif
+│   │   ├── 2026haasf1teamestoco01right.png
+│   │   ├── 2026haasf1teamolibea01right.avif
+│   │   ├── 2026haasf1teamolibea01right.png
+│   │   ├── 2026haaslogo.avif
+│   │   ├── 2026haaslogo.png
+│   │   ├── 2026mclarenlannor01right.avif
+│   │   ├── 2026mclarenlannor01right.png
+│   │   ├── 2026mclarenlogo.avif
+│   │   ├── 2026mclarenlogo.png
+│   │   ├── 2026mclarenoscpia01right.avif
+│   │   ├── 2026mclarenoscpia01right.png
+│   │   ├── 2026mercedesandant01right.avif
+│   │   ├── 2026mercedesandant01right.png
+│   │   ├── 2026mercedesgeorus01right.avif
+│   │   ├── 2026mercedesgeorus01right.png
+│   │   ├── 2026mercedeslogo.avif
+│   │   ├── 2026mercedeslogo.png
+│   │   ├── 2026racingbullsarvlin01right.avif
+│   │   ├── 2026racingbullsarvlin01right.png
+│   │   ├── 2026racingbullslialaw01right.avif
+│   │   ├── 2026racingbullslialaw01right.png
+│   │   ├── 2026racingbullslogo.avif
+│   │   ├── 2026racingbullslogo.png
+│   │   ├── 2026redbullracingisahad01right.avif
+│   │   ├── 2026redbullracingisahad01right.png
+│   │   ├── 2026redbullracinglogo.avif
+│   │   ├── 2026redbullracinglogo.png
+│   │   ├── 2026redbullracingmaxver01right.avif
+│   │   ├── 2026redbullracingmaxver01right.png
+│   │   ├── 2026williamsalealb01right.avif
+│   │   ├── 2026williamsalealb01right.png
+│   │   ├── 2026williamscarsai01right.avif
+│   │   ├── 2026williamscarsai01right.png
+│   │   ├── 2026williamslogo.avif
+│   │   └── 2026williamslogo.png
+│   ├── index.html
+│   ├── index.txt
+│   ├── manifest.json
+│   ├── next.svg
+│   ├── session
+│   │   ├── index.html
+│   │   └── index.txt
+│   ├── setup
+│   │   ├── driver
+│   │   │   ├── index.html
+│   │   │   └── index.txt
+│   │   ├── index.html
+│   │   ├── index.txt
+│   │   ├── time
+│   │   │   ├── index.html
+│   │   │   └── index.txt
+│   │   └── track
+│   │       ├── index.html
+│   │       └── index.txt
+│   ├── sw.js
+│   ├── swe-worker-5c72df51bb1f6ee0.js
+│   ├── vercel.svg
+│   ├── window.svg
+│   └── workbox-f1770938.js
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── public
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── icons
+│   ├── image
+│   │   ├── 2026alpinefracol01right.avif
+│   │   ├── 2026alpinefracol01right.png
+│   │   ├── 2026alpinelogo.avif
+│   │   ├── 2026alpinelogo.png
+│   │   ├── 2026alpinepiegas01right.avif
+│   │   ├── 2026alpinepiegas01right.png
+│   │   ├── 2026astonmartinferalo01right.avif
+│   │   ├── 2026astonmartinferalo01right.png
+│   │   ├── 2026astonmartinlanstr01right.avif
+│   │   ├── 2026astonmartinlanstr01right.png
+│   │   ├── 2026astonmartinlogo.avif
+│   │   ├── 2026astonmartinlogo.png
+│   │   ├── 2026audigabbor01right.avif
+│   │   ├── 2026audigabbor01right.png
+│   │   ├── 2026audilogo.avif
+│   │   ├── 2026audilogo.png
+│   │   ├── 2026audinichul01right.avif
+│   │   ├── 2026audinichul01right.png
+│   │   ├── 2026cadillaclogo.avif
+│   │   ├── 2026cadillaclogo.png
+│   │   ├── 2026cadillacserper01right.avif
+│   │   ├── 2026cadillacserper01right.png
+│   │   ├── 2026cadillacvalbot01right.avif
+│   │   ├── 2026cadillacvalbot01right.png
+│   │   ├── 2026ferrarichalec01right.avif
+│   │   ├── 2026ferrarichalec01right.png
+│   │   ├── 2026ferrarilewham01right.avif
+│   │   ├── 2026ferrarilewham01right.png
+│   │   ├── 2026ferrarilogo.avif
+│   │   ├── 2026ferrarilogo.png
+│   │   ├── 2026haasf1teamestoco01right.avif
+│   │   ├── 2026haasf1teamestoco01right.png
+│   │   ├── 2026haasf1teamolibea01right.avif
+│   │   ├── 2026haasf1teamolibea01right.png
+│   │   ├── 2026haaslogo.avif
+│   │   ├── 2026haaslogo.png
+│   │   ├── 2026mclarenlannor01right.avif
+│   │   ├── 2026mclarenlannor01right.png
+│   │   ├── 2026mclarenlogo.avif
+│   │   ├── 2026mclarenlogo.png
+│   │   ├── 2026mclarenoscpia01right.avif
+│   │   ├── 2026mclarenoscpia01right.png
+│   │   ├── 2026mercedesandant01right.avif
+│   │   ├── 2026mercedesandant01right.png
+│   │   ├── 2026mercedesgeorus01right.avif
+│   │   ├── 2026mercedesgeorus01right.png
+│   │   ├── 2026mercedeslogo.avif
+│   │   ├── 2026mercedeslogo.png
+│   │   ├── 2026racingbullsarvlin01right.avif
+│   │   ├── 2026racingbullsarvlin01right.png
+│   │   ├── 2026racingbullslialaw01right.avif
+│   │   ├── 2026racingbullslialaw01right.png
+│   │   ├── 2026racingbullslogo.avif
+│   │   ├── 2026racingbullslogo.png
+│   │   ├── 2026redbullracingisahad01right.avif
+│   │   ├── 2026redbullracingisahad01right.png
+│   │   ├── 2026redbullracinglogo.avif
+│   │   ├── 2026redbullracinglogo.png
+│   │   ├── 2026redbullracingmaxver01right.avif
+│   │   ├── 2026redbullracingmaxver01right.png
+│   │   ├── 2026williamsalealb01right.avif
+│   │   ├── 2026williamsalealb01right.png
+│   │   ├── 2026williamscarsai01right.avif
+│   │   ├── 2026williamscarsai01right.png
+│   │   ├── 2026williamslogo.avif
+│   │   └── 2026williamslogo.png
+│   ├── manifest.json
+│   ├── next.svg
+│   ├── sw.js
+│   ├── swe-worker-5c72df51bb1f6ee0.js
+│   ├── vercel.svg
+│   ├── window.svg
+│   └── workbox-f1770938.js
+├── scripts
+│   └── sync-driver-assets.js
+├── source-tree.txt
+├── src
+│   ├── app
+│   │   ├── calibrate
+│   │   │   └── page.tsx
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── session
+│   │   │   └── page.tsx
+│   │   └── setup
+│   │       ├── driver
+│   │       ├── page.tsx
+│   │       ├── time
+│   │       └── track
+│   ├── components
+│   │   ├── BroadcastFeed.tsx
+│   │   ├── DriverDot.tsx
+│   │   ├── PitModal.tsx
+│   │   ├── RankingBoard.tsx
+│   │   ├── ResultsOverlay.tsx
+│   │   ├── StudyTimer.tsx
+│   │   └── TrackMap.tsx
+│   ├── data
+│   │   ├── corners.ts
+│   │   ├── dnfReasons.ts
+│   │   ├── drivers.ts
+│   │   ├── images.ts
+│   │   └── tracks.ts
+│   ├── engine
+│   │   ├── lapTime.ts
+│   │   ├── pace.ts
+│   │   ├── raceEngine.ts
+│   │   ├── svgPath.ts
+│   │   └── types.ts
+│   └── store
+│       ├── sessionStore.ts
+│       └── setupStore.ts
+├── tailwind.config.ts
+├── test.png
+└── tsconfig.json
+
+52 directories, 260 files

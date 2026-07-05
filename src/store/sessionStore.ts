@@ -6,8 +6,10 @@ import { create } from 'zustand'
 import { SessionState, PitDuration } from '@/engine/types'
 import { DRIVERS, DRIVER_MAP } from '@/data/drivers'
 import { TRACK_MAP } from '@/data/tracks'
+import { DRIVER_FACE } from '@/data/images'
 import { generatePaces } from '@/engine/pace'
 import { createRacers, tickEngine, applyUserPit, applyUserDnf, applySkipFF, computeRanking } from '@/engine/raceEngine'
+
 
 interface SessionStore {
   session: SessionState | null
@@ -34,8 +36,13 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   rafId: null,
 
   startSession: (driverId, trackId, studyTargetMs) => {
-    const { stopSession } = get()
-    stopSession() // 기존 루프 정리
+    // Cancel only the web animation loop here. Native startActivity replaces any
+    // stale Live Activity atomically; calling stop/start back-to-back can race.
+    const existingRafId = get().rafId
+    if (existingRafId !== null) {
+      cancelAnimationFrame(existingRafId)
+      set({ rafId: null })
+    }
 
     const track = TRACK_MAP[trackId]
     if (!track) return
@@ -120,6 +127,11 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       currentSession = tickEngine(currentSession, step)
       remainingMs -= step
     }
+
+    const prevStatus = session.userStatus
+    const nextStatus = currentSession.userStatus
+    const prevPhase = session.phase
+    const nextPhase = currentSession.phase
 
     set({ session: currentSession })
   },
