@@ -35,6 +35,10 @@ export default function ResultsOverlay() {
 
   const userEntry = ranking.find((r) => r.isUser)
   const top3 = ranking.slice(0, 3)
+  const focusTimeMs = Math.max(0, session.studyElapsedMs - (session.accumulatedPitMs ?? 0))
+  const focusCompletion = session.studyTargetMs > 0
+    ? Math.min(100, Math.round((focusTimeMs / session.studyTargetMs) * 100))
+    : 0
 
   const handleRestart = () => {
     stopSession()
@@ -49,15 +53,16 @@ export default function ResultsOverlay() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md animate-fade-in">
+    <div className="dialog-overlay animate-fade-in">
       <div
         className="flex flex-col overflow-hidden shadow-2xl"
         style={{
           width: '580px',
           maxHeight: '92vh',
-          background: '#111116',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: '20px',
+          background: 'var(--panel)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-panel)',
+          boxShadow: 'var(--shadow-dialog)',
         }}
       >
         {/* 타이틀 */}
@@ -72,8 +77,40 @@ export default function ResultsOverlay() {
             </span>
           </div>
           <span style={{ fontSize: '13px', fontWeight: 900, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.85)', textTransform: 'uppercase' }}>
-            QUALIFYING RESULTS
+            FOCUS SESSION COMPLETE
           </span>
+        </div>
+
+        {/* 공부 결과를 레이스 결과보다 먼저 요약 */}
+        <div
+          style={{
+            margin: '12px 16px 0',
+            padding: '12px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '16px',
+            borderRadius: '12px',
+            flexShrink: 0,
+          }}
+          className="surface-card"
+        >
+          <div>
+            <div style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.32)' }}>
+              TOTAL FOCUS
+            </div>
+            <div className="font-mono tabular-nums" style={{ marginTop: '2px', fontSize: '26px', fontWeight: 900, color: '#FFFFFF', lineHeight: 1 }}>
+              {formatStudyTime(focusTimeMs)}
+            </div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '18px', fontWeight: 900, color: focusCompletion >= 100 ? '#00D2BE' : '#FF8000' }}>
+              {focusCompletion}%
+            </div>
+            <div style={{ marginTop: '2px', fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.3)' }}>
+              GOAL COMPLETED
+            </div>
+          </div>
         </div>
 
         {/* 포디움 */}
@@ -106,7 +143,7 @@ export default function ResultsOverlay() {
               flexShrink: 0,
             }}
           >
-            <StatCard label="공부 시간" value={formatStudyTime(Math.max(0, session.studyElapsedMs - (session.accumulatedPitMs ?? 0)))} />
+            <StatCard label="집중 시간" value={formatStudyTime(focusTimeMs)} />
             <div style={{ width: '1px', background: 'rgba(255,255,255,0.07)', alignSelf: 'stretch' }} />
             <StatCard label="최고 랩" value={userEntry.bestLap ? formatLapTime(userEntry.bestLap) : '—'} />
             <div style={{ width: '1px', background: 'rgba(255,255,255,0.07)', alignSelf: 'stretch' }} />
@@ -349,8 +386,8 @@ function PodiumCard({ entry, place }: { entry: RankingEntry; place: 1 | 2 | 3 })
         style={{
           position: 'relative',
           width: '100%',
-          height: `${imageHeight}px`,
-          borderRadius: '12px',
+          height: `min(${imageHeight}px, 21vh)`,
+          borderRadius: 'var(--radius-card)',
           overflow: 'hidden',
           background: 'rgba(255,255,255,0.04)',
           border: isUser

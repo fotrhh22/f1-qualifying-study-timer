@@ -34,24 +34,259 @@ html, body {
 
 /* ── 디자인 토큰 ── */
 :root {
-  --bg: #0D0D12;
-  --surface: #17171C;
-  --surface-2: #1D1D24;
-  --border: rgba(255,255,255,0.08);
-  --divider: rgba(255,255,255,0.05);
+  --canvas: #06080d;
+  --panel: #0c1018;
+  --surface: #131925;
+  --surface-hover: #19202d;
+  --border: #242b38;
+  --divider: rgba(146, 153, 170, 0.12);
 
-  --text-1: #FFFFFF;
-  --text-2: rgba(255,255,255,0.52);
-  --text-3: rgba(255,255,255,0.26);
-  --text-4: rgba(255,255,255,0.14);
+  --text-primary: #f7f8fb;
+  --text-secondary: #9299aa;
+  --text-muted: #626a7d;
+  --text-disabled: #414858;
 
-  --red: #E10600;
-  --yellow: #FFC906;
-  --orange: #FF8000;
-  --teal: #00D2BE;
+  --accent-red: #ff3155;
+  --accent-lime: #baff24;
+  --accent-yellow: #ffd340;
+  --accent-blue: #41b9ec;
+  --accent-orange: #ff8a34;
+  --success: #6df1a8;
+
+  /* 트랙 전용 팔레트: 세션 상태색과 분리해 지도에서만 사용 */
+  --sector-1: #f0448b;
+  --sector-2: #f5c451;
+  --sector-3: #2fc4d4;
+
+  --radius-panel: 20px;
+  --radius-card: 14px;
+  --radius-control: 11px;
+
+  --shadow-panel: 0 18px 50px rgba(0, 0, 0, 0.22);
+  --shadow-dialog: 0 28px 90px rgba(0, 0, 0, 0.55);
+
+  /* 기존 화면과의 점진적 호환을 위한 alias */
+  --bg: var(--canvas);
+  --surface-2: var(--surface-hover);
+  --text-1: var(--text-primary);
+  --text-2: var(--text-secondary);
+  --text-3: var(--text-muted);
+  --text-4: var(--text-disabled);
+  --red: var(--accent-red);
+  --yellow: var(--accent-yellow);
+  --orange: var(--accent-orange);
+  --teal: var(--success);
 }
 
 /* ── 공통 컴포넌트 ── */
+.dashboard-shell {
+  background: var(--canvas);
+  color: var(--text-primary);
+}
+
+.dashboard-panel {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+}
+
+.surface-card {
+  background: var(--surface);
+  border: 1px solid rgba(146, 153, 170, 0.1);
+  border-radius: var(--radius-card);
+}
+
+.surface-card-interactive {
+  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.surface-card-interactive:hover {
+  background: var(--surface-hover);
+  border-color: rgba(146, 153, 170, 0.2);
+}
+
+.section-label {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 4px 10px;
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.status-pill::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+  content: '';
+}
+
+.status-pill--active { color: var(--accent-lime); }
+.status-pill--break { color: var(--accent-yellow); }
+.status-pill--danger { color: var(--accent-red); }
+.status-pill--complete { color: var(--success); }
+.status-pill--fast { color: var(--accent-orange); }
+
+.metric-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid rgba(146, 153, 170, 0.1);
+  border-radius: var(--radius-control);
+}
+
+.control-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  color: var(--text-primary);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.control-button:hover:not(:disabled) {
+  background: #202838;
+  border-color: #333d4f;
+}
+
+.control-button:active:not(:disabled) { transform: scale(0.97); }
+.control-button:disabled { color: var(--text-disabled); cursor: not-allowed; opacity: 0.65; }
+.control-button--danger { color: #ff8a9e; background: rgba(255, 49, 85, 0.1); border-color: rgba(255, 49, 85, 0.25); }
+.control-button--danger:hover:not(:disabled) { color: #fff; background: rgba(255, 49, 85, 0.2); border-color: rgba(255, 49, 85, 0.45); }
+.control-button--pit { color: #ffe780; background: rgba(255, 211, 64, 0.08); border-color: rgba(255, 211, 64, 0.22); }
+
+.mono-value {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.025em;
+}
+
+.broadcast-feed-list {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.broadcast-feed-list > div {
+  flex-shrink: 0;
+  padding: 12px 13px !important;
+  background: var(--surface) !important;
+  border: 1px solid rgba(146, 153, 170, 0.1) !important;
+  border-left-width: 1px !important;
+  border-radius: var(--radius-card);
+  animation: fade-in 220ms ease-out;
+}
+
+.broadcast-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.broadcast-card--standard {
+  min-height: 84px;
+}
+
+.broadcast-card--priority {
+  min-height: 104px;
+}
+
+.broadcast-feed-list > div:hover {
+  background: var(--surface-hover) !important;
+}
+
+.broadcast-driver-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  min-width: 43px;
+  margin-top: auto;
+  padding: 4px 8px;
+  color: var(--text-primary);
+  background: rgba(6, 8, 13, 0.72);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.08em;
+}
+
+.broadcast-driver-badge__dot {
+  width: 5px;
+  height: 5px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(2, 3, 7, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.dialog-panel {
+  width: min(460px, 100%);
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-dialog);
+}
+
+.dashboard-grid {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: clamp(250px, 20vw, 296px) minmax(0, 1fr) clamp(270px, 20vw, 300px);
+  gap: 16px;
+}
+
 .f1-panel {
   background: var(--surface);
 }
@@ -82,6 +317,28 @@ html, body {
 .timer-display {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
+}
+
+@media (max-width: 1279px) {
+  .dashboard-grid {
+    grid-template-columns: 240px minmax(0, 1fr) 250px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .dashboard-grid {
+    grid-template-columns: 232px minmax(0, 1fr);
+  }
+
+  .dashboard-broadcast {
+    display: none !important;
+  }
+}
+
+@media (max-height: 759px) {
+  .dashboard-panel { border-radius: 16px; }
+  .metric-card { padding: 9px 12px; }
 }
 
 /* ── 애니메이션 ── */

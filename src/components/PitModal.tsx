@@ -1,4 +1,5 @@
 'use client'
+import { useEffect } from 'react'
 import { useSessionStore } from '@/store/sessionStore'
 import { PitDuration } from '@/engine/types'
 
@@ -20,104 +21,59 @@ export default function PitModal({ onClose }: PitModalProps) {
     onClose()
   }
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center"
-      onClick={onClose}
-    >
-      {/* 배경 */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [onClose])
 
-      {/* 바텀 시트 */}
-      <div
-        className="relative z-10 w-full animate-slide-up"
-        style={{ maxWidth: '480px' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* 핸들 */}
-        <div className="flex justify-center pb-3 pt-1">
-          <div className="w-10 h-1 rounded-full bg-[rgba(255,255,255,0.2)]" />
+  return (
+    <div className="dialog-overlay animate-fade-in" onClick={onClose} role="presentation">
+      <div className="dialog-panel" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="break-dialog-title">
+        <div style={{ padding: '28px 28px 22px' }}>
+          <div className="section-label" style={{ color: 'var(--accent-yellow)' }}>Pit stop</div>
+          <div id="break-dialog-title" className="font-black tracking-tight leading-none" style={{ marginTop: '8px', fontSize: '28px', color: 'var(--text-primary)' }}>
+            휴식할까요?
+          </div>
+          <div className="mt-3 leading-relaxed" style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>
+            휴식 시간을 선택하면 공부 타이머가 멈추고 드라이버는 PIT로 들어갑니다.
+          </div>
         </div>
 
-        <div
-          className="border border-[rgba(255,255,255,0.08)] overflow-hidden"
-          style={{
-            background: '#17171C',
-            borderRadius: '16px 16px 0 0',
-          }}
-        >
-          {/* 헤더 */}
-          <div className="flex items-center justify-between px-5 pt-5 pb-4">
-            <div>
-              <div className="text-white text-base font-black tracking-tight">PIT STOP</div>
-              <div className="text-[rgba(255,255,255,0.35)] text-[11px] mt-0.5 tracking-wider">
-                공부 중단 시간을 선택하세요
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-[rgba(255,255,255,0.4)] hover:text-white hover:bg-[rgba(255,255,255,0.08)] transition-all"
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* 구분선 */}
-          <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)' }} />
-
-          {/* 옵션들 */}
-          <div className="flex gap-3 px-5 py-5">
+        <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '10px' }}>
             {PIT_OPTIONS.map(({ minutes, label, desc }) => (
               <button
                 key={minutes}
                 onClick={() => handlePit(minutes)}
-                className="flex-1 flex flex-col items-center justify-center py-4 gap-1 transition-all duration-150 group"
+                className="flex-1 flex flex-col items-center justify-center transition-all active:scale-[0.97]"
                 style={{
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '12px',
-                }}
-                onMouseEnter={(e) => {
-                  ;(e.currentTarget as HTMLElement).style.borderColor = '#FFF200'
-                  ;(e.currentTarget as HTMLElement).style.background = 'rgba(255,242,0,0.06)'
-                }}
-                onMouseLeave={(e) => {
-                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'
-                  ;(e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'
+                  minHeight: '82px',
+                  background: 'rgba(255,211,64,0.08)',
+                  border: '1px solid rgba(255,211,64,0.24)',
+                  borderRadius: 'var(--radius-control)',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
                 }}
               >
-                <span className="text-white text-3xl font-black leading-none">
-                  {label}
-                </span>
-                <span className="text-[rgba(255,255,255,0.35)] text-[10px] tracking-widest">
-                  MIN
-                </span>
-                <span className="text-[rgba(255,255,255,0.35)] text-[10px] tracking-widest uppercase mt-0.5">
-                  {desc}
+                <span className="font-black leading-none" style={{ fontSize: '26px' }}>{label}</span>
+                <span style={{ marginTop: '4px', fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--accent-yellow)' }}>
+                  MIN · {desc}
                 </span>
               </button>
             ))}
           </div>
-
-          {/* 안내 + 취소 */}
-          <div className="px-5 pb-6 flex flex-col gap-2">
-            <div
-              className="text-[rgba(255,255,255,0.2)] text-[10px] tracking-wider text-center py-2"
-              style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}
-            >
-              NPC 드라이버는 계속 달립니다
-            </div>
-            <button
-              onClick={onClose}
-              className="w-full py-3 text-[rgba(255,255,255,0.5)] text-xs font-bold tracking-widest hover:text-white transition-colors"
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                borderRadius: '10px',
-              }}
-            >
-              CANCEL
-            </button>
+          <div style={{ textAlign: 'center', fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.06em' }}>
+            휴식 중 다른 드라이버는 계속 달립니다
           </div>
+          <button
+            onClick={onClose}
+            className="control-button w-full"
+          >
+            계속하기
+          </button>
         </div>
       </div>
     </div>

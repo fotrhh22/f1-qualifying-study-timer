@@ -7,9 +7,9 @@ import { CornerData } from '@/engine/types'
 import { getPointAtProgress } from '@/engine/svgPath'
 import DriverDot from './DriverDot'
 
-const S1 = '#E91B8C'
-const S2 = '#FFD100'
-const S3 = '#00A3E0'
+const S1 = 'var(--sector-1)'
+const S2 = 'var(--sector-2)'
+const S3 = 'var(--sector-3)'
 
 export default function TrackMap() {
   const session = useSession()
@@ -61,7 +61,8 @@ export default function TrackMap() {
       if (ry > rMaxY) rMaxY = ry
     }
 
-    const pad = 24
+    // 큰 드라이버 마커와 코드 라벨이 가장자리에서 잘리지 않도록 여백 확보
+    const pad = 42
     setBounds({
       minX: rMinX - pad,
       minY: rMinY - pad,
@@ -117,7 +118,7 @@ export default function TrackMap() {
   return (
     <div
       className="relative w-full h-full flex items-center justify-center"
-      style={{ padding: '24px', background: '#1A1B28' }}
+      style={{ padding: '32px', background: 'var(--panel)' }}
     >
       <svg
         viewBox={`${bounds.minX} ${bounds.minY} ${bounds.w} ${bounds.h}`}
@@ -128,17 +129,12 @@ export default function TrackMap() {
         {/* Rotation Group wrapper */}
         <g transform={`rotate(${rotAngle}, ${bounds.cx}, ${bounds.cy})`}>
           {/* ── 트랙 레이어 ── */}
-          {/* 외곽 검정 테두리: colored(8) 대비 2px씩만 넓혀 겹침 방지 */}
-          {/* scale 배율을 무시하여 SVG 로컬 좌표 기준 고정 크기로 렌더링 */}
-          <path d={p} stroke="#0C0C0C" strokeWidth={10} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-
-          {/* 섹터 컬러 (pathLength 정규화) */}
-          <path d={p} pathLength="100" stroke={S1} strokeWidth={8} fill="none" strokeLinecap="butt" strokeLinejoin="round" {...s1Props} />
-          <path d={p} pathLength="100" stroke={S2} strokeWidth={8} fill="none" strokeLinecap="butt" strokeLinejoin="round" {...s2Props} />
-          <path d={p} pathLength="100" stroke={S3} strokeWidth={8} fill="none" strokeLinecap="butt" strokeLinejoin="round" {...s3Props} />
-
-          {/* 중앙 진한 선 */}
-          <path d={p} stroke="#0A0A0A" strokeWidth={0.8} fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
+          {/* 섹터별 주행선: S1 마젠타, S2 앰버, S3 틸 */}
+          <path d={p} stroke="#2D3442" strokeWidth={13} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <path d={p} pathLength="100" stroke={S1} strokeWidth={7} fill="none" strokeLinecap="butt" strokeLinejoin="round" {...s1Props} />
+          <path d={p} pathLength="100" stroke={S2} strokeWidth={7} fill="none" strokeLinecap="butt" strokeLinejoin="round" {...s2Props} />
+          <path d={p} pathLength="100" stroke={S3} strokeWidth={7} fill="none" strokeLinecap="butt" strokeLinejoin="round" {...s3Props} />
+          <path d={p} stroke="#080A10" strokeWidth={0.9} fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.65" />
 
           {/* ── 시작/종료 라인 ── */}
           <StartFinishLine trackId={track.id} svgPath={p} pathOffset={offset} pathOffsetReversed={isRev} />
@@ -155,6 +151,7 @@ export default function TrackMap() {
               pathOffsetReversed={isRev} 
               rotationAngle={rotAngle}
               scale={scale}
+              showLabel
             />
           ))}
         </g>
@@ -178,10 +175,10 @@ export default function TrackMap() {
 
       {/* HTML Sector Legend Overlay */}
       <div 
-        className="absolute bottom-4 left-4 flex flex-col gap-1.5 p-3 rounded-lg border backdrop-blur-md"
+        className="absolute bottom-4 left-4 flex items-center gap-4 px-3 py-2 rounded-lg border backdrop-blur-md"
         style={{
-          background: 'rgba(11, 12, 23, 0.75)',
-          borderColor: 'rgba(255, 255, 255, 0.08)',
+          background: 'rgba(19, 25, 37, 0.82)',
+          borderColor: 'var(--border)',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
           zIndex: 10,
         }}
@@ -193,7 +190,7 @@ export default function TrackMap() {
         ].map((item) => (
           <div key={item.label} className="flex items-center gap-2">
             <div style={{ width: '16px', height: '6px', borderRadius: '2px', background: item.color }} />
-            <span style={{ fontSize: '10px', fontWeight: 800, color: 'rgba(255, 255, 255, 0.78)', letterSpacing: '0.05em' }}>
+            <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-secondary)', letterSpacing: '0.06em' }}>
               {item.label}
             </span>
           </div>

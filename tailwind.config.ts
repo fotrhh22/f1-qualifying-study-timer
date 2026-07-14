@@ -9,6 +9,24 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        dashboard: {
+          canvas: "#06080D",
+          panel: "#0C1018",
+          surface: "#131925",
+          hover: "#19202D",
+          border: "#242B38",
+          primary: "#F7F8FB",
+          secondary: "#9299AA",
+          muted: "#626A7D",
+          red: "#FF3155",
+          lime: "#BAFF24",
+          yellow: "#FFD340",
+          blue: "#41B9EC",
+          success: "#6DF1A8",
+          sector1: "#F0448B",
+          sector2: "#F5C451",
+          sector3: "#2FC4D4",
+        },
         f1: {
           red: "#E10600",
           black: "#000000",

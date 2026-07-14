@@ -1,90 +1,74 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { useSession } from '@/store/sessionStore'
 import { formatStudyTime } from '@/engine/lapTime'
 
 export default function StudyTimer() {
   const session = useSession()
+  const [now, setNow] = useState(() => Date.now())
+
+  const pitEndAt = session?.pitEndAt
+  const isPitActive = session?.userStatus === 'PIT' && !!pitEndAt
+
+  useEffect(() => {
+    if (!isPitActive) return
+
+    setNow(Date.now())
+    const intervalId = window.setInterval(() => setNow(Date.now()), 1000)
+    return () => window.clearInterval(intervalId)
+  }, [isPitActive, pitEndAt])
 
   if (!session) return null
 
-  const elapsed = session.studyElapsedMs
-  const target = session.studyTargetMs
-  const progress = Math.min(elapsed / target, 1)
+  const elapsed = Number.isFinite(session.studyElapsedMs) ? Math.max(session.studyElapsedMs, 0) : 0
+  const target = Number.isFinite(session.studyTargetMs) ? Math.max(session.studyTargetMs, 0) : 0
+  const progress = target > 0 ? Math.min(elapsed / target, 1) : 0
   const remaining = Math.max(target - elapsed, 0)
-  const isRunning = session.phase === 'RUNNING'
   const isPit = session.userStatus === 'PIT'
   const isFF = session.phase === 'FAST_FORWARD'
   const isFinished = session.phase === 'FINISHED'
 
-  const stateColor = isFinished ? '#00A896'
-    : isFF ? '#D06A00'
-    : isPit ? '#B8920A'
-    : '#C40000'
+  const stateColor = isFinished ? 'var(--success)'
+    : isFF ? 'var(--accent-orange)'
+    : isPit ? 'var(--accent-yellow)'
+    : 'var(--accent-lime)'
+
+  const pitRemaining = isPit && session.pitEndAt
+    ? Math.max(session.pitEndAt - now, 0)
+    : 0
+  const primaryTime = isPit ? pitRemaining : isFF || isFinished ? elapsed : remaining
+  const primaryLabel = isFinished ? 'TOTAL FOCUS'
+    : isFF ? 'FOCUS COMPLETE'
+    : isPit ? 'BREAK REMAINING'
+    : 'REMAINING'
+  const statusLabel = isFinished ? 'COMPLETE'
+    : isFF ? 'FINISHING'
+    : isPit ? 'BREAK'
+    : 'FOCUSING'
 
   return (
-    <div className="flex flex-col">
-      <div className="px-4 flex flex-col gap-3 items-center justify-center" style={{ minHeight: '130px' }}>
-        {/* 상태 배지 */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '5px',
-            padding: '3px 8px',
-            borderRadius: '6px',
-            background: isFinished ? 'rgba(0,168,150,0.12)'
-              : isFF ? 'rgba(208,106,0,0.12)'
-              : isPit ? 'rgba(184,146,10,0.12)'
-              : 'rgba(196,0,0,0.10)',
-            border: `1px solid ${stateColor}60`,
-          }}
-        >
-          <span
-            style={{
-              width: '5px',
-              height: '5px',
-              borderRadius: '50%',
-              background: stateColor,
-              flexShrink: 0,
-              ...(isPit || isFF ? { animation: 'pulse-red 1.2s ease-in-out infinite' } : {}),
-            }}
-          />
-          <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.1em', color: stateColor }}>
-            {isFinished ? 'DONE' : isFF ? 'FAST FWD' : isPit ? 'IN PIT' : 'RUNNING'}
-          </span>
+    <div className="flex flex-col" style={{ padding: '14px' }}>
+      <div className="surface-card flex flex-col gap-4 justify-center" style={{ minHeight: '184px', padding: '14px' }}>
+        <div className="flex items-center justify-between">
+          <span className="section-label">Focus Timer</span>
+          <span className={`status-pill ${isFinished ? 'status-pill--complete' : isFF ? 'status-pill--fast' : isPit ? 'status-pill--break' : 'status-pill--active'}`} style={{ minHeight: '22px', padding: '2px 8px', fontSize: '8px' }}>{statusLabel}</span>
         </div>
 
         {/* 메인 타이머 */}
         <div className="flex flex-col items-center">
           <div
-            className="font-mono tabular-nums leading-none"
+            className="mono-value leading-none"
             style={{
-              fontSize: '30px',
+              fontSize: 'clamp(38px, 3.7vw, 48px)',
               fontWeight: 900,
-              letterSpacing: '-0.02em',
-              color: isFF || isFinished ? 'rgba(255,255,255,0.3)'
-                : isPit ? '#FFF200'
-                : '#FFFFFF',
+              color: isFF || isFinished ? 'var(--text-secondary)' : isPit ? 'var(--accent-yellow)' : 'var(--text-primary)',
             }}
           >
-            {formatStudyTime(isFF || isFinished ? target : elapsed)}
+            {formatStudyTime(primaryTime)}
           </div>
-
-          <div className="mt-1 text-center" style={{ fontSize: '11px', minHeight: '16px' }}>
-            {isRunning && !isPit && (
-              <span style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
-                {formatStudyTime(remaining)} left
-              </span>
-            )}
-            {isPit && session.pitEndAt && (
-              <span style={{ color: '#B8920A', fontFamily: 'monospace', fontWeight: 700 }}>
-                {formatStudyTime(Math.max(session.pitEndAt - Date.now(), 0))} left
-              </span>
-            )}
-            {isFF && (
-              <span style={{ color: '#D06A00', fontWeight: 700 }}>SESSION ENDED</span>
-            )}
-          </div>
+          <span className="mt-1 section-label" style={{ color: stateColor }}>
+            {primaryLabel}
+          </span>
         </div>
 
         {/* 진행 바 */}
@@ -92,7 +76,7 @@ export default function StudyTimer() {
           <div
             style={{
               height: '5px',
-              background: 'rgba(255,255,255,0.08)',
+              background: 'var(--border)',
               borderRadius: '99px',
               overflow: 'hidden',
             }}
@@ -101,16 +85,18 @@ export default function StudyTimer() {
               style={{
                 height: '100%',
                 borderRadius: '99px',
-                background: stateColor,
+                background: isPit ? 'var(--accent-yellow)' : 'var(--accent-red)',
                 width: `${progress * 100}%`,
                 transition: 'width 1s linear',
               }}
             />
           </div>
-          <div className="flex justify-between mt-1">
-            <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '10px', fontFamily: 'monospace' }}>0:00</span>
-            <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '10px', fontFamily: 'monospace' }}>
-              {formatStudyTime(target)}
+          <div className="flex justify-between mt-1.5">
+            <span className="mono-value" style={{ color: 'var(--text-secondary)', fontSize: '8px' }}>
+              {formatStudyTime(elapsed)} ELAPSED
+            </span>
+            <span className="mono-value" style={{ color: 'var(--text-muted)', fontSize: '8px' }}>
+              {formatStudyTime(target)} GOAL
             </span>
           </div>
         </div>

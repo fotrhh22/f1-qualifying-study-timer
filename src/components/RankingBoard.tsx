@@ -13,7 +13,7 @@ export default function RankingBoard() {
   if (!session) return null
 
   return (
-    <div className="flex flex-col flex-1 min-h-0" style={{ background: '#0D0E1A' }}>
+    <div className="flex flex-col flex-1 min-h-0">
       {/* 헤더 */}
       <div
         style={{
@@ -21,10 +21,10 @@ export default function RankingBoard() {
           fontSize: '11px',
           fontWeight: 800,
           letterSpacing: '0.14em',
-          color: 'rgba(255,255,255,0.5)',
+          color: 'var(--text-secondary)',
           textTransform: 'uppercase',
-          background: '#090A14',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          background: 'transparent',
+          borderBottom: '1px solid var(--divider)',
           flexShrink: 0,
         }}
       >
@@ -39,16 +39,13 @@ export default function RankingBoard() {
           const isInPit = entry.status === 'IN_PIT' || entry.status === 'FORCED_PIT'
           const logoSrc = TEAM_LOGO[entry.teamName]
 
-          const posColor = entry.position === 1 ? '#FFD700'
-            : entry.position === 2 ? '#AAA'
-            : entry.position === 3 ? '#CD7F32'
-            : 'rgba(255,255,255,0.3)'
+          const posColor = entry.position === 1 ? 'var(--accent-lime)' : 'var(--text-muted)'
 
-          const timeColor = isDnf ? '#E10600'
-            : !hasLap ? 'rgba(255,255,255,0.25)'
-            : entry.position === 1 ? '#FFFFFF'
-            : isUser ? '#FF8000'
-            : 'rgba(255,255,255,0.5)'
+          const timeColor = isDnf ? 'var(--accent-red)'
+            : !hasLap ? 'var(--text-muted)'
+            : entry.position === 1 ? 'var(--text-primary)'
+            : isUser ? 'var(--accent-yellow)'
+            : 'var(--text-secondary)'
 
           return (
             <div
@@ -57,10 +54,11 @@ export default function RankingBoard() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '6px 10px 6px 0',
-                borderBottom: '1px solid rgba(255,255,255,0.04)',
-                borderLeft: `3px solid ${isUser ? '#E10600' : 'transparent'}`,
-                background: isUser ? 'rgba(225,6,0,0.10)' : 'transparent',
+                minHeight: '38px',
+                padding: '5px 10px 5px 0',
+                borderBottom: '1px solid var(--divider)',
+                borderLeft: `3px solid ${isUser ? 'var(--accent-red)' : 'transparent'}`,
+                background: isUser ? 'var(--surface-hover)' : 'transparent',
                 opacity: 1,
                 transition: 'all 0.3s',
               }}
@@ -114,7 +112,7 @@ export default function RankingBoard() {
                   fontSize: '13px',
                   fontWeight: 900,
                   letterSpacing: '0.04em',
-                  color: 'rgba(255,255,255,0.85)',
+                  color: 'var(--text-primary)',
                   flexShrink: 0,
                   width: '35px',
                 }}
@@ -132,9 +130,9 @@ export default function RankingBoard() {
                     letterSpacing: '0.06em',
                     fontSize: '9px',
                     borderRadius: '4px',
-                    background: 'rgba(184,146,10,0.15)',
-                    border: '1px solid #B8920A',
-                    color: '#B8920A',
+                    background: 'rgba(255,211,64,0.1)',
+                    border: '1px solid rgba(255,211,64,0.35)',
+                    color: 'var(--accent-yellow)',
                     lineHeight: 1.4,
                   }}
                 >
@@ -166,7 +164,7 @@ export default function RankingBoard() {
         })}
 
         {ranking.length === 0 && (
-          <div style={{ padding: '24px 12px', textAlign: 'center', fontSize: '10px', letterSpacing: '0.1em', color: '#AAA' }}>
+          <div style={{ padding: '24px 12px', textAlign: 'center', fontSize: '10px', letterSpacing: '0.1em', color: 'var(--text-muted)' }}>
             WAITING...
           </div>
         )}

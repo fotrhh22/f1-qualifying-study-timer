@@ -461,27 +461,25 @@ export default function BroadcastFeed() {
 
   return (
     <div
-      className="flex flex-col flex-shrink-0"
+      className="dashboard-panel flex flex-col"
       style={{
-        width: '240px',
+        width: '100%',
         height: '100%',
-        background: '#0B0C17',
-        borderLeft: '1px solid rgba(255,255,255,0.06)',
       }}
     >
       {/* 헤더 */}
       <div
         style={{
-          padding: '8px 14px',
+          padding: '15px 16px 12px',
           display: 'flex',
           alignItems: 'center',
           gap: '7px',
           fontSize: '11px',
           fontWeight: 800,
           letterSpacing: '0.14em',
-          color: 'rgba(255,255,255,0.4)',
+          color: 'var(--text-secondary)',
           textTransform: 'uppercase' as const,
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          borderBottom: '1px solid var(--divider)',
           flexShrink: 0,
         }}
       >
@@ -490,16 +488,16 @@ export default function BroadcastFeed() {
             width: '6px',
             height: '6px',
             borderRadius: '50%',
-            background: '#E10600',
+            background: 'var(--accent-red)',
             flexShrink: 0,
             animation: isActive ? 'pulse-red 1.2s ease-in-out infinite' : undefined,
           }}
         />
-        LIVE FEEDS
+        LIVE BROADCAST
       </div>
 
       {/* 피드 */}
-      <div ref={feedRef} style={{ flex: 1, overflowY: 'auto', padding: '4px 0' }}>
+      <div ref={feedRef} className="broadcast-feed-list">
         {events.length === 0 && (
           <div
             style={{
@@ -507,7 +505,7 @@ export default function BroadcastFeed() {
               textAlign: 'center',
               fontSize: '10px',
               letterSpacing: '0.1em',
-              color: 'rgba(255,255,255,0.16)',
+              color: 'var(--text-muted)',
             }}
           >
             WAITING...
@@ -539,13 +537,31 @@ export default function BroadcastFeed() {
           }
         })}
       </div>
+      <div className="section-label" style={{ flexShrink: 0, padding: '10px 14px 13px', textAlign: 'center', fontSize: '8px' }}>
+        Auto-updating live session
+      </div>
     </div>
+  )
+}
+
+function DriverBadge({ event }: { event: FeedEvent }) {
+  if (!event.racerId) return null
+
+  return (
+    <span className="broadcast-driver-badge">
+      <span
+        className="broadcast-driver-badge__dot"
+        style={{ background: event.teamColor, color: event.teamColor }}
+      />
+      {event.racerId}
+    </span>
   )
 }
 
 function FastestLapItem({ event }: { event: FeedEvent }) {
   return (
     <div
+      className="broadcast-card broadcast-card--priority"
       style={{
         padding: '9px 14px 10px',
         borderBottom: '1px solid rgba(255,255,255,0.04)',
@@ -604,6 +620,7 @@ function FastestLapItem({ event }: { event: FeedEvent }) {
           </span>
         )}
       </div>
+      <DriverBadge event={event} />
     </div>
   )
 }
@@ -614,6 +631,7 @@ function FlagItem({ event }: { event: FeedEvent }) {
   const bg = isRed ? 'rgba(225,6,0,0.12)' : 'rgba(255,210,0,0.12)'
   return (
     <div
+      className="broadcast-card broadcast-card--priority"
       style={{
         padding: '9px 14px 10px',
         borderBottom: '1px solid rgba(255,255,255,0.04)',
@@ -652,6 +670,7 @@ function FlagItem({ event }: { event: FeedEvent }) {
 function DnfItem({ event }: { event: FeedEvent }) {
   return (
     <div
+      className="broadcast-card broadcast-card--priority"
       style={{
         padding: '9px 14px 10px',
         borderBottom: '1px solid rgba(255,255,255,0.04)',
@@ -691,6 +710,7 @@ function DnfItem({ event }: { event: FeedEvent }) {
           {event.reason}
         </span>
       </div>
+      <DriverBadge event={event} />
     </div>
   )
 }
@@ -698,7 +718,7 @@ function DnfItem({ event }: { event: FeedEvent }) {
 // 📈 개인 기록 개선 / 순위 등락 통합 렌더러
 function ImprovementItem({ event }: { event: FeedEvent }) {
   return (
-    <div style={{ padding: '7px 14px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+    <div className="broadcast-card broadcast-card--standard" style={{ padding: '7px 14px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <span style={{ fontSize: '11px', fontWeight: 600, color: '#E4F9FF' }}>
           {event.text}
@@ -707,6 +727,7 @@ function ImprovementItem({ event }: { event: FeedEvent }) {
           {formatTs(event.ts)}
         </span>
       </div>
+      <DriverBadge event={event} />
     </div>
   )
 }
@@ -714,7 +735,7 @@ function ImprovementItem({ event }: { event: FeedEvent }) {
 // 🟢 트랙 출차 렌더러
 function PitExitItem({ event }: { event: FeedEvent }) {
   return (
-    <div style={{ padding: '7px 14px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+    <div className="broadcast-card broadcast-card--standard" style={{ padding: '7px 14px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <span style={{ fontSize: '11px', fontWeight: 500, color: '#34D399' }}>
           {event.text}
@@ -723,6 +744,7 @@ function PitExitItem({ event }: { event: FeedEvent }) {
           {formatTs(event.ts)}
         </span>
       </div>
+      <DriverBadge event={event} />
     </div>
   )
 }
@@ -730,7 +752,7 @@ function PitExitItem({ event }: { event: FeedEvent }) {
 // 🔥 플라잉 랩 어택 시작 렌더러
 function AttackStartItem({ event }: { event: FeedEvent }) {
   return (
-    <div style={{ padding: '7px 14px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+    <div className="broadcast-card broadcast-card--standard" style={{ padding: '7px 14px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <span style={{ fontSize: '11px', fontWeight: 700, color: '#FB923C' }}>
           {event.text}
@@ -739,6 +761,7 @@ function AttackStartItem({ event }: { event: FeedEvent }) {
           {formatTs(event.ts)}
         </span>
       </div>
+      <DriverBadge event={event} />
     </div>
   )
 }
@@ -746,7 +769,7 @@ function AttackStartItem({ event }: { event: FeedEvent }) {
 // ⚠️ 트래픽 경고 렌더러
 function TrafficItem({ event }: { event: FeedEvent }) {
   return (
-    <div style={{ padding: '8px 14px', borderBottom: '1px solid rgba(255,255,255,0.03)', background: 'rgba(251,146,60,0.02)' }}>
+    <div className="broadcast-card broadcast-card--standard" style={{ padding: '8px 14px', borderBottom: '1px solid rgba(255,255,255,0.03)', background: 'rgba(251,146,60,0.02)' }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <span style={{ fontSize: '11px', fontWeight: 500, color: '#FBBF24' }}>
           {event.text}
@@ -755,6 +778,7 @@ function TrafficItem({ event }: { event: FeedEvent }) {
           {formatTs(event.ts)}
         </span>
       </div>
+      <DriverBadge event={event} />
     </div>
   )
 }
@@ -763,6 +787,7 @@ function TrafficItem({ event }: { event: FeedEvent }) {
 function FiaInvestigationItem({ event }: { event: FeedEvent }) {
   return (
     <div
+      className="broadcast-card broadcast-card--standard"
       style={{
         padding: '9px 14px 10px',
         borderBottom: '1px solid rgba(255,255,255,0.04)',
@@ -795,6 +820,7 @@ function FiaInvestigationItem({ event }: { event: FeedEvent }) {
       <div style={{ fontSize: '10px', color: '#A1A1AA', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
         Reason: {event.subText}
       </div>
+      <DriverBadge event={event} />
     </div>
   )
 }
@@ -806,6 +832,7 @@ function FiaDecisionItem({ event }: { event: FeedEvent }) {
   const textCol = isNoFurtherAction ? '#34D399' : '#F87171'
   return (
     <div
+      className="broadcast-card broadcast-card--priority"
       style={{
         padding: '9px 14px 10px',
         borderBottom: '1px solid rgba(255,255,255,0.04)',
@@ -838,6 +865,7 @@ function FiaDecisionItem({ event }: { event: FeedEvent }) {
       <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>
         {event.subText}
       </div>
+      <DriverBadge event={event} />
     </div>
   )
 }

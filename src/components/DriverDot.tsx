@@ -12,9 +12,10 @@ interface DriverDotProps {
   pathOffsetReversed?: boolean
   rotationAngle?: number
   scale?: number
+  showLabel?: boolean
 }
 
-export default function DriverDot({ racer, trackId, svgPath, isUser, pathOffset, pathOffsetReversed, rotationAngle = 0, scale = 1 }: DriverDotProps) {
+export default function DriverDot({ racer, trackId, svgPath, isUser, pathOffset, pathOffsetReversed, rotationAngle = 0, showLabel = false }: DriverDotProps) {
   const groupRef = useRef<SVGGElement>(null)
   const isRev = !!pathOffsetReversed
   const calibratedProgress = isRev
@@ -66,11 +67,12 @@ export default function DriverDot({ racer, trackId, svgPath, isUser, pathOffset,
   // 피트에 있으면 숨김
   if (isInPit) return null
 
-  // SVG viewBox는 500×500 — 도트를 트랙 두께 대비 적절한 크기로
-  // scale 배율을 무시하여 SVG 로컬 좌표 기준 고정 크기로 렌더링 (헝가로링 비율)
-  // 유저와 NPC 모두 고정 반지름 9.6 사용
-  const dotRadius = 9.6
+  // 레퍼런스처럼 섹터 선 위에서도 즉시 구분되는 큰 팀 컬러 마커
+  const dotRadius = isUser ? 11 : 9.5
   const color = racer.teamColor
+  const labelOnLeft = initialPos.x > 250
+  const labelX = labelOnLeft ? -(dotRadius + 7) : dotRadius + 7
+  const labelAnchor = labelOnLeft ? 'end' : 'start'
 
   return (
     <g
@@ -82,35 +84,41 @@ export default function DriverDot({ racer, trackId, svgPath, isUser, pathOffset,
       {/* 유저 강조 글로우 링 */}
       {isUser && (
         <>
-          <circle r={dotRadius + 8.4} fill="none" stroke="white" strokeWidth={0.72} opacity={0.2} />
-          <circle r={dotRadius + 4.8} fill="none" stroke="white" strokeWidth={1.2} opacity={0.55} />
+          <circle r={dotRadius + 8} fill="none" stroke={color} strokeWidth={1.2} opacity={0.22} />
+          <circle r={dotRadius + 5} fill="none" stroke="white" strokeWidth={1.1} opacity={0.45} />
         </>
       )}
 
-      {/* 메인 점 — 흰 테두리로 모든 섹터 색 위에서 가시성 확보 */}
-      <circle r={dotRadius + 1.8} fill="white" opacity={0.9} />
+      {/* 흰 링 + 팀 컬러 채움: 어떤 섹터 위에서도 동일한 대비 유지 */}
+      <circle r={dotRadius + 3.4} fill="#080A10" opacity={0.82} />
+      <circle r={dotRadius + 2.2} fill={color} stroke="#F7F8FB" strokeWidth={2.6} />
       <circle
-        r={dotRadius}
+        r={dotRadius - 1.1}
         fill={color}
-        stroke={isUser ? '#FFFFFF' : 'rgba(255,255,255,0.6)'}
-        strokeWidth={isUser ? 2.4 : 1.2}
+        stroke="rgba(6, 8, 13, 0.32)"
+        strokeWidth={0.8}
       />
 
-      {/* 드라이버 코드 라벨 */}
-      <g transform={`translate(${dotRadius + 6}, ${dotRadius * 0.42}) rotate(${-rotationAngle})`}>
+      {/* 레퍼런스처럼 배경 pill 없이 선명한 드라이버 코드 표시 */}
+      {(showLabel || isUser) && <g transform={`translate(${labelX}, 0) rotate(${-rotationAngle})`}>
         <text
           x={0}
-          y={0}
-          fill="white"
-          fontSize={12}
-          fontWeight="bold"
-          fontFamily="monospace"
+          y={0.5}
+          fill="#F7F8FB"
+          stroke="#080A10"
+          strokeWidth={2.8}
+          paintOrder="stroke"
+          fontSize={11.5}
+          fontWeight={900}
+          fontFamily="'JetBrains Mono', 'SFMono-Regular', Consolas, monospace"
+          letterSpacing="0.02em"
           style={{ pointerEvents: 'none', userSelect: 'none' }}
           dominantBaseline="central"
+          textAnchor={labelAnchor}
         >
           {racer.id}
         </text>
-      </g>
+      </g>}
     </g>
   )
 }
