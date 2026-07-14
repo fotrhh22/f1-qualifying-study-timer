@@ -14,6 +14,7 @@ const S3 = 'var(--sector-3)'
 export default function TrackMap() {
   const session = useSession()
   const track = session ? TRACK_MAP[session.trackId] : null
+  const [showTurningPoints, setShowTurningPoints] = useState(true)
 
   const [bounds, setBounds] = useState({ minX: 0, minY: 0, w: 500, h: 500, cx: 250, cy: 250 })
 
@@ -157,7 +158,7 @@ export default function TrackMap() {
         </g>
 
         {/* ── 코너 번호 (counter-rotated) ── */}
-        {corners.length > 0 && (
+        {showTurningPoints && corners.length > 0 && (
           <CornerLabels
             trackId={track.id}
             svgPath={p}
@@ -196,6 +197,16 @@ export default function TrackMap() {
           </div>
         ))}
       </div>
+
+      <button
+        type="button"
+        className="track-toggle-button"
+        aria-pressed={showTurningPoints}
+        onClick={() => setShowTurningPoints((visible) => !visible)}
+      >
+        <span className="track-toggle-button__indicator" data-active={showTurningPoints} />
+        TURNING POINTS
+      </button>
     </div>
   )
 }
