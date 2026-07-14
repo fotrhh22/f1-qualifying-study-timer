@@ -10,15 +10,16 @@ const config: Config = {
     extend: {
       colors: {
         dashboard: {
-          canvas: "#06080D",
-          panel: "#0C1018",
-          surface: "#131925",
-          hover: "#19202D",
-          border: "#242B38",
+          canvas: "#0D0D12",
+          panel: "#111116",
+          surface: "#17171C",
+          hover: "#1C1C22",
+          border: "rgba(255,255,255,0.08)",
           primary: "#F7F8FB",
           secondary: "#9299AA",
           muted: "#626A7D",
-          red: "#FF3155",
+          brandRed: "#E10600",
+          red: "#E10600",
           lime: "#BAFF24",
           yellow: "#FFD340",
           blue: "#41B9EC",

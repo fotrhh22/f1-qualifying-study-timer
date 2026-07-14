@@ -64,7 +64,7 @@ export default function SessionHeader() {
       </div>
 
       <div className="flex items-center justify-center gap-3 min-w-0">
-        <div className="flex items-center justify-center font-black" style={{ width: '34px', height: '34px', borderRadius: '10px', background: 'var(--accent-red)', fontSize: '11px' }}>
+        <div className="flex items-center justify-center font-black" style={{ width: '34px', height: '34px', borderRadius: '10px', background: 'var(--brand-red)', fontSize: '11px' }}>
           F1
         </div>
         <div className="min-w-0">

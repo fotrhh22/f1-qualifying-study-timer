@@ -132,7 +132,7 @@ function EndSessionDialog({ onCancel, onConfirm }: { onCancel: () => void; onCon
     <div className="dialog-overlay animate-fade-in" onClick={onCancel} role="presentation">
       <div className="dialog-panel" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="end-session-title">
         <div style={{ padding: '28px 28px 22px' }}>
-          <div className="section-label" style={{ color: 'var(--accent-red)' }}>Retire from session</div>
+          <div className="section-label" style={{ color: 'var(--brand-red)' }}>Retire from session</div>
           <h2 id="end-session-title" style={{ marginTop: '8px', fontSize: '28px', fontWeight: 900, letterSpacing: '-0.03em' }}>공부를 끝낼까요?</h2>
           <p style={{ marginTop: '10px', fontSize: '13px', lineHeight: 1.65, color: 'var(--text-secondary)' }}>
             현재 집중 세션을 종료하고 FAST FORWARD로 나머지 퀄리파잉 결과를 확인합니다.

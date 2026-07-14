@@ -35,10 +35,6 @@ export default function ResultsOverlay() {
 
   const userEntry = ranking.find((r) => r.isUser)
   const top3 = ranking.slice(0, 3)
-  const focusTimeMs = Math.max(0, session.studyElapsedMs - (session.accumulatedPitMs ?? 0))
-  const focusCompletion = session.studyTargetMs > 0
-    ? Math.min(100, Math.round((focusTimeMs / session.studyTargetMs) * 100))
-    : 0
 
   const handleRestart = () => {
     stopSession()
@@ -53,16 +49,15 @@ export default function ResultsOverlay() {
   }
 
   return (
-    <div className="dialog-overlay animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md animate-fade-in">
       <div
         className="flex flex-col overflow-hidden shadow-2xl"
         style={{
           width: '580px',
           maxHeight: '92vh',
-          background: 'var(--panel)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-panel)',
-          boxShadow: 'var(--shadow-dialog)',
+          background: '#111116',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '20px',
         }}
       >
         {/* 타이틀 */}
@@ -77,40 +72,8 @@ export default function ResultsOverlay() {
             </span>
           </div>
           <span style={{ fontSize: '13px', fontWeight: 900, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.85)', textTransform: 'uppercase' }}>
-            FOCUS SESSION COMPLETE
+            QUALIFYING RESULTS
           </span>
-        </div>
-
-        {/* 공부 결과를 레이스 결과보다 먼저 요약 */}
-        <div
-          style={{
-            margin: '12px 16px 0',
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px',
-            borderRadius: '12px',
-            flexShrink: 0,
-          }}
-          className="surface-card"
-        >
-          <div>
-            <div style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.32)' }}>
-              TOTAL FOCUS
-            </div>
-            <div className="font-mono tabular-nums" style={{ marginTop: '2px', fontSize: '26px', fontWeight: 900, color: '#FFFFFF', lineHeight: 1 }}>
-              {formatStudyTime(focusTimeMs)}
-            </div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '18px', fontWeight: 900, color: focusCompletion >= 100 ? '#00D2BE' : '#FF8000' }}>
-              {focusCompletion}%
-            </div>
-            <div style={{ marginTop: '2px', fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.3)' }}>
-              GOAL COMPLETED
-            </div>
-          </div>
         </div>
 
         {/* 포디움 */}
@@ -134,27 +97,30 @@ export default function ResultsOverlay() {
         {userEntry && (
           <div
             style={{
-              margin: '10px 16px 0',
+              position: 'relative',
+              margin: '12px 16px 0',
               display: 'flex',
-              borderRadius: '10px',
+              borderRadius: '12px',
               overflow: 'hidden',
-              background: 'rgba(225,6,0,0.07)',
-              border: '1px solid rgba(225,6,0,0.22)',
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.025), transparent), #17171C',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 10px 28px rgba(0,0,0,0.18)',
               flexShrink: 0,
             }}
           >
-            <StatCard label="집중 시간" value={formatStudyTime(focusTimeMs)} />
-            <div style={{ width: '1px', background: 'rgba(255,255,255,0.07)', alignSelf: 'stretch' }} />
-            <StatCard label="최고 랩" value={userEntry.bestLap ? formatLapTime(userEntry.bestLap) : '—'} />
-            <div style={{ width: '1px', background: 'rgba(255,255,255,0.07)', alignSelf: 'stretch' }} />
+            <div style={{ position: 'absolute', top: 0, left: '14px', width: '34px', height: '2px', borderRadius: '0 0 2px 2px', background: '#E10600' }} />
+            <StatCard label="FOCUS TIME" value={formatStudyTime(Math.max(0, session.studyElapsedMs - (session.accumulatedPitMs ?? 0)))} />
+            <div style={{ width: '1px', margin: '11px 0', background: 'rgba(255,255,255,0.065)', alignSelf: 'stretch' }} />
+            <StatCard label="BEST LAP" value={userEntry.bestLap ? formatLapTime(userEntry.bestLap) : '—'} />
+            <div style={{ width: '1px', margin: '11px 0', background: 'rgba(255,255,255,0.065)', alignSelf: 'stretch' }} />
             <StatCard
-              label="최종 순위"
+              label="FINAL POSITION"
               value={`P${userEntry.position}`}
-              highlight={userEntry.position <= 3}
+              highlight
               subValue="/ 22"
             />
-            <div style={{ width: '1px', background: 'rgba(255,255,255,0.07)', alignSelf: 'stretch' }} />
-            <StatCard label="전체 랩" value={`${userEntry.totalLaps}L`} />
+            <div style={{ width: '1px', margin: '11px 0', background: 'rgba(255,255,255,0.065)', alignSelf: 'stretch' }} />
+            <StatCard label="LAPS COMPLETED" value={`${userEntry.totalLaps}`} subValue="LAPS" />
           </div>
         )}
 
@@ -386,8 +352,8 @@ function PodiumCard({ entry, place }: { entry: RankingEntry; place: 1 | 2 | 3 })
         style={{
           position: 'relative',
           width: '100%',
-          height: `min(${imageHeight}px, 21vh)`,
-          borderRadius: 'var(--radius-card)',
+          height: `${imageHeight}px`,
+          borderRadius: '12px',
           overflow: 'hidden',
           background: 'rgba(255,255,255,0.04)',
           border: isUser
@@ -506,18 +472,19 @@ function StatCard({
   subValue?: string
 }) {
   return (
-    <div className="flex-1 flex flex-col items-center py-3 px-2 gap-0.5">
-      <span style={{ fontSize: '9px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', fontWeight: 700 }}>
+    <div className="flex-1 flex flex-col min-w-0" style={{ padding: '14px 13px 13px', gap: '6px' }}>
+      <span className="truncate" style={{ fontSize: '8px', lineHeight: 1, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.32)', fontWeight: 800 }}>
         {label}
       </span>
-      <div className="flex items-baseline gap-1">
+      <div className="flex items-baseline min-w-0" style={{ gap: '5px' }}>
         <span
-          style={{ fontWeight: 900, fontSize: '14px', fontFamily: 'monospace', color: highlight ? '#FFD700' : '#FFFFFF' }}
+          className="truncate"
+          style={{ fontWeight: 900, fontSize: '16px', lineHeight: 1, fontFamily: 'monospace', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.035em', color: highlight ? '#E10600' : '#FFFFFF' }}
         >
           {value}
         </span>
         {subValue && (
-          <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.28)' }}>{subValue}</span>
+          <span style={{ flexShrink: 0, fontSize: '8px', fontWeight: 750, letterSpacing: '0.06em', color: 'rgba(255,255,255,0.24)' }}>{subValue}</span>
         )}
       </div>
     </div>

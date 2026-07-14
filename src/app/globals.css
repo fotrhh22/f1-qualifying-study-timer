@@ -34,19 +34,21 @@ html, body {
 
 /* ── 디자인 토큰 ── */
 :root {
-  --canvas: #06080d;
-  --panel: #0c1018;
-  --surface: #131925;
-  --surface-hover: #19202d;
-  --border: #242b38;
-  --divider: rgba(146, 153, 170, 0.12);
+  --canvas: #0d0d12;
+  --panel: #111116;
+  --surface: #17171c;
+  --surface-hover: #1c1c22;
+  --border: rgba(255, 255, 255, 0.08);
+  --divider: rgba(255, 255, 255, 0.06);
 
   --text-primary: #f7f8fb;
   --text-secondary: #9299aa;
   --text-muted: #626a7d;
   --text-disabled: #414858;
 
-  --accent-red: #ff3155;
+  --brand-red: #e10600;
+  --brand-red-hover: #ff1800;
+  --accent-red: var(--brand-red);
   --accent-lime: #baff24;
   --accent-yellow: #ffd340;
   --accent-blue: #41b9ec;
@@ -184,8 +186,8 @@ html, body {
 
 .control-button:active:not(:disabled) { transform: scale(0.97); }
 .control-button:disabled { color: var(--text-disabled); cursor: not-allowed; opacity: 0.65; }
-.control-button--danger { color: #ff8a9e; background: rgba(255, 49, 85, 0.1); border-color: rgba(255, 49, 85, 0.25); }
-.control-button--danger:hover:not(:disabled) { color: #fff; background: rgba(255, 49, 85, 0.2); border-color: rgba(255, 49, 85, 0.45); }
+.control-button--danger { color: #ff8b87; background: rgba(225, 6, 0, 0.12); border-color: rgba(225, 6, 0, 0.32); }
+.control-button--danger:hover:not(:disabled) { color: #fff; background: rgba(225, 6, 0, 0.26); border-color: rgba(225, 6, 0, 0.58); }
 .control-button--pit { color: #ffe780; background: rgba(255, 211, 64, 0.08); border-color: rgba(255, 211, 64, 0.22); }
 
 .mono-value {
