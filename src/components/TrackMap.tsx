@@ -196,17 +196,17 @@ export default function TrackMap() {
             </span>
           </div>
         ))}
+        <div aria-hidden="true" style={{ width: '1px', height: '14px', background: 'rgba(255,255,255,0.1)' }} />
+        <button
+          type="button"
+          className="track-toggle-button"
+          aria-pressed={showTurningPoints}
+          onClick={() => setShowTurningPoints((visible) => !visible)}
+        >
+          <span className="track-toggle-button__indicator" data-active={showTurningPoints}>✓</span>
+          CORNER NUMBERS
+        </button>
       </div>
-
-      <button
-        type="button"
-        className="track-toggle-button"
-        aria-pressed={showTurningPoints}
-        onClick={() => setShowTurningPoints((visible) => !visible)}
-      >
-        <span className="track-toggle-button__indicator" data-active={showTurningPoints} />
-        TURNING POINTS
-      </button>
     </div>
   )
 }

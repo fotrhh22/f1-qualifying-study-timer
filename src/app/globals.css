@@ -187,10 +187,9 @@ html, body {
 .control-button:active:not(:disabled) { transform: scale(0.97); }
 .control-button:disabled { color: var(--text-disabled); cursor: not-allowed; opacity: 0.65; }
 .control-button--danger {
-  color: #fff;
-  background: rgba(225, 6, 0, 0.18);
-  border-color: rgba(225, 6, 0, 0.58);
-  box-shadow: inset 3px 0 0 var(--brand-red);
+  color: #ff8a9e;
+  background: rgba(255, 49, 85, 0.1);
+  border-color: rgba(255, 49, 85, 0.25);
 }
 .control-button--danger:hover:not(:disabled) {
   color: #fff;
@@ -199,53 +198,50 @@ html, body {
   box-shadow: 0 7px 22px rgba(225, 6, 0, 0.24);
 }
 .control-button--pit {
-  color: #ffe273;
-  background: rgba(190, 137, 0, 0.2);
-  border-color: rgba(226, 174, 30, 0.55);
-  box-shadow: inset 3px 0 0 #d6a600;
+  color: #ffe780;
+  background: rgba(255, 211, 64, 0.08);
+  border-color: rgba(255, 211, 64, 0.22);
 }
 .control-button--pit:hover:not(:disabled) {
   color: #17120a;
-  background: #e0b321;
+  background: #d6a600;
   border-color: #f1cc50;
   box-shadow: 0 7px 22px rgba(214, 166, 0, 0.2);
 }
 
 .track-toggle-button {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  z-index: 10;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 32px;
-  padding: 0 11px;
+  padding: 2px 0;
   color: var(--text-secondary);
-  background: rgba(17, 17, 22, 0.86);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
+  background: transparent;
+  border: 0;
   font-size: 8px;
   font-weight: 850;
   letter-spacing: 0.08em;
-  transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
+  cursor: pointer;
+  transition: color 150ms ease, opacity 150ms ease;
 }
 .track-toggle-button:hover {
   color: var(--text-primary);
-  background: rgba(28, 28, 34, 0.94);
-  border-color: rgba(255, 255, 255, 0.16);
 }
 .track-toggle-button__indicator {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--text-disabled);
-  transition: background 150ms ease, box-shadow 150ms ease;
+  display: inline-flex;
+  width: 11px;
+  height: 11px;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0.28;
+  transition: color 150ms ease, opacity 150ms ease;
 }
 .track-toggle-button__indicator[data-active="true"] {
-  background: var(--brand-red);
-  box-shadow: 0 0 8px rgba(225, 6, 0, 0.55);
+  color: rgba(255, 255, 255, 0.72);
+  opacity: 1;
 }
 
 .mono-value {
