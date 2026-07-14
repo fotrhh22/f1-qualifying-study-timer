@@ -210,15 +210,21 @@ html, body {
 }
 
 .track-toggle-button {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 10;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 2px 0;
+  height: 20px;
+  padding: 0;
   color: var(--text-secondary);
   background: transparent;
   border: 0;
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 850;
+  line-height: 1;
   letter-spacing: 0.08em;
   cursor: pointer;
   transition: color 150ms ease, opacity 150ms ease;
@@ -228,12 +234,12 @@ html, body {
 }
 .track-toggle-button__indicator {
   display: inline-flex;
-  width: 11px;
-  height: 11px;
+  width: 14px;
+  height: 14px;
   align-items: center;
   justify-content: center;
   color: rgba(255, 255, 255, 0.38);
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 900;
   line-height: 1;
   opacity: 0.28;

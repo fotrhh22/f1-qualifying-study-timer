@@ -176,11 +176,8 @@ export default function TrackMap() {
 
       {/* HTML Sector Legend Overlay */}
       <div 
-        className="absolute bottom-4 left-4 flex items-center gap-4 px-3 py-2 rounded-lg border backdrop-blur-md"
+        className="absolute bottom-4 left-4 flex h-5 items-center gap-4"
         style={{
-          background: 'rgba(19, 25, 37, 0.82)',
-          borderColor: 'var(--border)',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
           zIndex: 10,
         }}
       >
@@ -191,22 +188,22 @@ export default function TrackMap() {
         ].map((item) => (
           <div key={item.label} className="flex items-center gap-2">
             <div style={{ width: '16px', height: '6px', borderRadius: '2px', background: item.color }} />
-            <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-secondary)', letterSpacing: '0.06em' }}>
+            <span style={{ fontSize: '9px', lineHeight: 1, fontWeight: 800, color: 'var(--text-secondary)', letterSpacing: '0.06em' }}>
               {item.label}
             </span>
           </div>
         ))}
-        <div aria-hidden="true" style={{ width: '1px', height: '14px', background: 'rgba(255,255,255,0.1)' }} />
-        <button
-          type="button"
-          className="track-toggle-button"
-          aria-pressed={showTurningPoints}
-          onClick={() => setShowTurningPoints((visible) => !visible)}
-        >
-          <span className="track-toggle-button__indicator" data-active={showTurningPoints}>✓</span>
-          CORNER NUMBERS
-        </button>
       </div>
+
+      <button
+        type="button"
+        className="track-toggle-button"
+        aria-pressed={showTurningPoints}
+        onClick={() => setShowTurningPoints((visible) => !visible)}
+      >
+        <span className="track-toggle-button__indicator" data-active={showTurningPoints}>✓</span>
+        CORNER NUMBERS
+      </button>
     </div>
   )
 }
