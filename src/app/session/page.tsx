@@ -21,13 +21,14 @@ export default function SessionPage() {
   if (!session) return null
 
   return (
-    <main className="dashboard-shell flex h-screen w-screen flex-col overflow-hidden select-none" style={{ padding: '16px 20px 82px', gap: '16px' }}>
+    <main className="dashboard-shell session-frame select-none">
+      <div className="session-top-rule" aria-hidden="true" />
       <SessionHeader />
 
-      <div className="dashboard-grid flex-1">
+      <div className="session-grid">
         <DriverSidebar />
         <CircuitPanel />
-        <div className="dashboard-broadcast min-w-0 min-h-0">
+        <div className="dashboard-broadcast session-content-above-rail min-w-0 min-h-0" style={{ borderLeft: '1px solid var(--session-rule-strong)' }}>
           <BroadcastFeed />
         </div>
       </div>

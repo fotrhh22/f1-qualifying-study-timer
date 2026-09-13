@@ -119,7 +119,7 @@ export default function TrackMap() {
   return (
     <div
       className="relative w-full h-full flex items-center justify-center"
-      style={{ padding: '32px', background: 'var(--panel)' }}
+      style={{ padding: '26px 30px 32px', background: 'var(--canvas)' }}
     >
       <svg
         viewBox={`${bounds.minX} ${bounds.minY} ${bounds.w} ${bounds.h}`}

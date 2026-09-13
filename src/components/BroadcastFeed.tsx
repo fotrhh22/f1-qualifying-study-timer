@@ -14,12 +14,12 @@ type FeedEvent = {
     | 'DNF'
     | 'YELLOW_FLAG'
     | 'RED_FLAG'
-    | 'IMPROVEMENT'       // 📈 Improves to Px (-X.XXs) / remains Px (-X.XXs)
-    | 'PIT_EXIT'          // 🟢 Leaves pit lane / starts final run
-    | 'ATTACK_START'      // 🔥 Begins final flying lap / attempt
-    | 'TRAFFIC'           // ⚠️ Catches traffic / may be impeded
-    | 'FIA_INVESTIGATION' // 📝 FIA under investigation
-    | 'FIA_DECISION'      // 📋 FIA Decision
+    | 'IMPROVEMENT'       // Improves to Px (-X.XXs) / remains Px (-X.XXs)
+    | 'PIT_EXIT'          // Leaves pit lane / starts final run
+    | 'ATTACK_START'      // Begins final flying lap / attempt
+    | 'TRAFFIC'           // Catches traffic / may be impeded
+    | 'FIA_INVESTIGATION' // FIA under investigation
+    | 'FIA_DECISION'      // FIA decision
   racerId: string
   teamColor: string
   ts: number
@@ -54,6 +54,10 @@ function randomReason(): string {
 function formatTs(ts: number): string {
   const d = new Date(ts)
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
+}
+
+function stripLegacyEventIcon(text = ''): string {
+  return text.replace(/^(?:\u{1F4C8}|\u{1F525}|\u26A0\uFE0F?|\u{1F7E2})\s*/u, '')
 }
 
 export default function BroadcastFeed() {
@@ -161,8 +165,8 @@ export default function BroadcastFeed() {
           racerId: pending.racerId,
           teamColor: pending.teamColor,
           ts: now,
-          text: `📋 FIA Decision: ${decisionText}`,
-          subText: `${pending.racerId} - ${subText}`,
+          text: decisionText,
+          subText: `${pending.racerId} · ${subText}`,
         })
       } else {
         stillPending.push(pending)
@@ -196,8 +200,8 @@ export default function BroadcastFeed() {
       const isOutLap = racer.status === 'OUT_LAP'
       if (wasInPit && isOutLap) {
         const text = isFinalMinutes
-          ? `🟢 ${racer.id} starts final run`
-          : `🟢 ${racer.id} leaves the pit lane`
+          ? `${racer.id} starts final run`
+          : `${racer.id} leaves the pit lane`
         
         newEvents.push({
           id: getNextEventId(),
@@ -231,7 +235,7 @@ export default function BroadcastFeed() {
             racerId: racer.id,
             teamColor: racer.teamColor,
             ts: now,
-            text: `📝 FIA: ${racer.id} under investigation`,
+            text: `${racer.id} under investigation`,
             subText: catText,
           })
           pendingFiaDecisionsRef.current.push({
@@ -250,8 +254,8 @@ export default function BroadcastFeed() {
       if (wasNotFlying && isFlying) {
         if (isFinalMinutes || session.phase === 'FAST_FORWARD') {
           const text = Math.random() < 0.5
-            ? `🔥 ${racer.id} begins final flying lap`
-            : `🔥 ${racer.id} begins final attempt`
+            ? `${racer.id} begins final flying lap`
+            : `${racer.id} begins final attempt`
           
           newEvents.push({
             id: getNextEventId(),
@@ -271,7 +275,7 @@ export default function BroadcastFeed() {
             racerId: racer.id,
             teamColor: racer.teamColor,
             ts: now,
-            text: `📝 FIA: ${racer.id} under investigation`,
+            text: `${racer.id} under investigation`,
             subText: 'Impeding',
           })
           pendingFiaDecisionsRef.current.push({
@@ -294,8 +298,8 @@ export default function BroadcastFeed() {
             
             // 시간 단축 정보와 순위 변동이 모두 담긴 1개의 카드로 통합
             const improvementText = currPos < prevPos
-              ? `📈 ${racer.id} improves to P${currPos} (-${deltaSec.toFixed(3)}s)`
-              : `📈 ${racer.id} improves but remains P${currPos} (-${deltaSec.toFixed(3)}s)`
+              ? `${racer.id} improves to P${currPos} (-${deltaSec.toFixed(3)}s)`
+              : `${racer.id} improves but remains P${currPos} (-${deltaSec.toFixed(3)}s)`
 
             newEvents.push({
               id: getNextEventId(),
@@ -314,7 +318,7 @@ export default function BroadcastFeed() {
                 racerId: racer.id,
                 teamColor: racer.teamColor,
                 ts: now,
-                text: `📝 FIA: ${racer.id} under investigation`,
+                text: `${racer.id} under investigation`,
                 subText: 'Track Limits',
               })
               pendingFiaDecisionsRef.current.push({
@@ -334,7 +338,7 @@ export default function BroadcastFeed() {
               racerId: racer.id,
               teamColor: racer.teamColor,
               ts: now,
-              text: `📈 ${racer.id} sets first time P${currPos}`,
+              text: `${racer.id} sets first time P${currPos}`,
             })
           }
 
@@ -379,11 +383,11 @@ export default function BroadcastFeed() {
               : 'Sector 3'
 
             const roll = Math.random()
-            let text = `⚠️ ${racer.id} catches traffic`
+            let text = `${racer.id} catches traffic`
             if (roll < 0.33) {
-              text = `⚠️ ${racer.id} catches traffic in ${sector}`
+              text = `${racer.id} catches traffic in ${sector}`
             } else if (roll < 0.66) {
-              text = `⚠️ ${racer.id} may be impeded`
+              text = `${racer.id} may be impeded`
             }
 
             newEvents.push({
@@ -461,7 +465,7 @@ export default function BroadcastFeed() {
 
   return (
     <div
-      className="dashboard-panel flex flex-col"
+      className="session-section flex flex-col"
       style={{
         width: '100%',
         height: '100%',
@@ -469,17 +473,9 @@ export default function BroadcastFeed() {
     >
       {/* 헤더 */}
       <div
+        className="session-divider-heading"
         style={{
-          padding: '15px 16px 12px',
-          display: 'flex',
-          alignItems: 'center',
           gap: '7px',
-          fontSize: '11px',
-          fontWeight: 800,
-          letterSpacing: '0.14em',
-          color: 'var(--text-secondary)',
-          textTransform: 'uppercase' as const,
-          borderBottom: '1px solid var(--divider)',
           flexShrink: 0,
         }}
       >
@@ -537,24 +533,7 @@ export default function BroadcastFeed() {
           }
         })}
       </div>
-      <div className="section-label" style={{ flexShrink: 0, padding: '10px 14px 13px', textAlign: 'center', fontSize: '8px' }}>
-        Auto-updating live session
-      </div>
     </div>
-  )
-}
-
-function DriverBadge({ event }: { event: FeedEvent }) {
-  if (!event.racerId) return null
-
-  return (
-    <span className="broadcast-driver-badge">
-      <span
-        className="broadcast-driver-badge__dot"
-        style={{ background: event.teamColor, color: event.teamColor }}
-      />
-      {event.racerId}
-    </span>
   )
 }
 
@@ -580,7 +559,7 @@ function FastestLapItem({ event }: { event: FeedEvent }) {
             color: '#E30080',
           }}
         >
-          ⏱️ FASTEST LAP
+          FASTEST LAP
         </span>
         <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'rgba(255,255,255,0.18)' }}>
           {formatTs(event.ts)}
@@ -620,7 +599,6 @@ function FastestLapItem({ event }: { event: FeedEvent }) {
           </span>
         )}
       </div>
-      <DriverBadge event={event} />
     </div>
   )
 }
@@ -652,7 +630,7 @@ function FlagItem({ event }: { event: FeedEvent }) {
             color,
           }}
         >
-          ⚠️ {isRed ? 'RED FLAG' : 'YELLOW FLAG'}
+          {isRed ? 'RED FLAG' : 'YELLOW FLAG'}
         </span>
         <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'rgba(255,255,255,0.18)' }}>
           {formatTs(event.ts)}
@@ -689,7 +667,7 @@ function DnfItem({ event }: { event: FeedEvent }) {
             color: '#E10600',
           }}
         >
-          ❌ DNF
+          DNF
         </span>
         <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'rgba(255,255,255,0.18)' }}>
           {formatTs(event.ts)}
@@ -710,81 +688,82 @@ function DnfItem({ event }: { event: FeedEvent }) {
           {event.reason}
         </span>
       </div>
-      <DriverBadge event={event} />
     </div>
   )
 }
 
-// 📈 개인 기록 개선 / 순위 등락 통합 렌더러
+// 개인 기록 개선 / 순위 등락 통합 렌더러
 function ImprovementItem({ event }: { event: FeedEvent }) {
   return (
     <div className="broadcast-card broadcast-card--standard" style={{ padding: '7px 14px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span className="broadcast-event-dot" style={{ background: 'var(--accent-blue)' }} aria-hidden="true" />
         <span style={{ fontSize: '11px', fontWeight: 600, color: '#E4F9FF' }}>
-          {event.text}
+          {stripLegacyEventIcon(event.text)}
         </span>
         <span style={{ marginLeft: 'auto', fontSize: '8px', color: 'rgba(255,255,255,0.15)' }}>
           {formatTs(event.ts)}
         </span>
       </div>
-      <DriverBadge event={event} />
     </div>
   )
 }
 
-// 🟢 트랙 출차 렌더러
+// 트랙 출차 렌더러
 function PitExitItem({ event }: { event: FeedEvent }) {
   return (
     <div className="broadcast-card broadcast-card--standard" style={{ padding: '7px 14px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span className="broadcast-event-dot" aria-hidden="true" />
         <span style={{ fontSize: '11px', fontWeight: 500, color: '#34D399' }}>
-          {event.text}
+          {stripLegacyEventIcon(event.text)}
         </span>
         <span style={{ marginLeft: 'auto', fontSize: '8px', color: 'rgba(255,255,255,0.15)' }}>
           {formatTs(event.ts)}
         </span>
       </div>
-      <DriverBadge event={event} />
     </div>
   )
 }
 
-// 🔥 플라잉 랩 어택 시작 렌더러
+// 플라잉 랩 어택 시작 렌더러
 function AttackStartItem({ event }: { event: FeedEvent }) {
   return (
     <div className="broadcast-card broadcast-card--standard" style={{ padding: '7px 14px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span className="broadcast-event-dot" style={{ background: 'var(--accent-orange)' }} aria-hidden="true" />
         <span style={{ fontSize: '11px', fontWeight: 700, color: '#FB923C' }}>
-          {event.text}
+          {stripLegacyEventIcon(event.text)}
         </span>
         <span style={{ marginLeft: 'auto', fontSize: '8px', color: 'rgba(255,255,255,0.15)' }}>
           {formatTs(event.ts)}
         </span>
       </div>
-      <DriverBadge event={event} />
     </div>
   )
 }
 
-// ⚠️ 트래픽 경고 렌더러
+// 트래픽 경고 렌더러
 function TrafficItem({ event }: { event: FeedEvent }) {
   return (
     <div className="broadcast-card broadcast-card--standard" style={{ padding: '8px 14px', borderBottom: '1px solid rgba(255,255,255,0.03)', background: 'rgba(251,146,60,0.02)' }}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span className="broadcast-event-dot" style={{ background: 'var(--accent-yellow)' }} aria-hidden="true" />
         <span style={{ fontSize: '11px', fontWeight: 500, color: '#FBBF24' }}>
-          {event.text}
+          {stripLegacyEventIcon(event.text)}
         </span>
         <span style={{ marginLeft: 'auto', fontSize: '8px', color: 'rgba(255,255,255,0.15)' }}>
           {formatTs(event.ts)}
         </span>
       </div>
-      <DriverBadge event={event} />
     </div>
   )
 }
 
-// 📝 FIA 조사 중 렌더러
+// FIA 조사 중 렌더러
 function FiaInvestigationItem({ event }: { event: FeedEvent }) {
+  const eventText = event.text?.replace(/^\u{1F4DD}\s*FIA:\s*/u, '')
+
   return (
     <div
       className="broadcast-card broadcast-card--standard"
@@ -796,38 +775,26 @@ function FiaInvestigationItem({ event }: { event: FeedEvent }) {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-        <span
-          style={{
-            fontSize: '8px',
-            fontWeight: 900,
-            letterSpacing: '0.08em',
-            padding: '1px 5px',
-            borderRadius: '3px',
-            background: 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(255,255,255,0.2)',
-            color: '#A1A1AA',
-          }}
-        >
-          📝 FIA
-        </span>
+        <span style={{ fontSize: '8px', fontWeight: 950, letterSpacing: '0.14em', color: '#D6D8DF' }}>FIA</span>
+        <span style={{ fontSize: '8px', fontWeight: 800, letterSpacing: '0.12em', color: '#8B92A3' }}>· INVESTIGATION</span>
         <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'rgba(255,255,255,0.15)' }}>
           {formatTs(event.ts)}
         </span>
       </div>
       <div style={{ fontSize: '11px', fontWeight: 700, color: '#fff', marginBottom: '2px' }}>
-        {event.text}
+        {eventText}
       </div>
       <div style={{ fontSize: '10px', color: '#A1A1AA', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
         Reason: {event.subText}
       </div>
-      <DriverBadge event={event} />
     </div>
   )
 }
 
-// 📋 FIA 판정 결과 렌더러
+// FIA 판정 결과 렌더러
 function FiaDecisionItem({ event }: { event: FeedEvent }) {
-  const isNoFurtherAction = event.text?.includes('No Further Action')
+  const eventText = event.text?.replace(/^\u{1F4CB}\s*FIA Decision:\s*/u, '')
+  const isNoFurtherAction = eventText?.includes('No Further Action')
   const borderCol = isNoFurtherAction ? '#10B981' : '#EF4444'
   const textCol = isNoFurtherAction ? '#34D399' : '#F87171'
   return (
@@ -841,31 +808,18 @@ function FiaDecisionItem({ event }: { event: FeedEvent }) {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-        <span
-          style={{
-            fontSize: '8px',
-            fontWeight: 900,
-            letterSpacing: '0.08em',
-            padding: '1px 5px',
-            borderRadius: '3px',
-            background: `${borderCol}20`,
-            border: `1px solid ${borderCol}40`,
-            color: textCol,
-          }}
-        >
-          📋 FIA DECISION
-        </span>
+        <span style={{ fontSize: '8px', fontWeight: 950, letterSpacing: '0.14em', color: '#D6D8DF' }}>FIA</span>
+        <span style={{ fontSize: '8px', fontWeight: 800, letterSpacing: '0.12em', color: textCol }}>· DECISION</span>
         <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'rgba(255,255,255,0.15)' }}>
           {formatTs(event.ts)}
         </span>
       </div>
       <div style={{ fontSize: '11px', fontWeight: 800, color: '#fff', marginBottom: '2px' }}>
-        {event.text}
+        {eventText}
       </div>
       <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)' }}>
         {event.subText}
       </div>
-      <DriverBadge event={event} />
     </div>
   )
 }

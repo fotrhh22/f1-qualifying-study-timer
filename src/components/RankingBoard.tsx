@@ -15,19 +15,7 @@ export default function RankingBoard() {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       {/* 헤더 */}
-      <div
-        style={{
-          padding: '8px 14px',
-          fontSize: '11px',
-          fontWeight: 800,
-          letterSpacing: '0.14em',
-          color: 'var(--text-secondary)',
-          textTransform: 'uppercase',
-          background: 'transparent',
-          borderBottom: '1px solid var(--divider)',
-          flexShrink: 0,
-        }}
-      >
+      <div className="session-divider-heading" style={{ flexShrink: 0 }}>
         LIVE RANKING
       </div>
 

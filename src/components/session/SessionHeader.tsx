@@ -21,25 +21,16 @@ export default function SessionHeader() {
   const driver = DRIVER_MAP[session.userId]
 
   return (
-    <header
-      className="dashboard-panel grid items-center flex-shrink-0"
-      style={{
-        minHeight: '72px',
-        gridTemplateColumns: 'minmax(210px, 1fr) auto minmax(210px, 1fr)',
-        columnGap: '24px',
-        padding: '0 20px',
-      }}
-    >
+    <header className="session-header">
       <div className="flex items-center min-w-0" style={{ width: 'fit-content', minWidth: '210px', gap: '14px' }}>
         <div
           className="relative overflow-hidden flex-shrink-0"
           style={{
-            width: '46px',
-            height: '46px',
+            width: '38px',
+            height: '38px',
             borderRadius: '50%',
             background: `${driver?.teamColor ?? '#fff'}24`,
-            border: `2px solid ${driver?.teamColor ?? 'var(--border)'}`,
-            boxShadow: `0 0 0 3px ${driver?.teamColor ?? '#fff'}18`,
+            border: `1px solid ${driver?.teamColor ?? 'var(--border)'}`,
           }}
         >
           {DRIVER_FACE[session.userId] && (
@@ -49,22 +40,20 @@ export default function SessionHeader() {
         <span
           aria-hidden="true"
           style={{
-            width: '5px',
-            height: '42px',
+            width: '3px',
+            height: '32px',
             flexShrink: 0,
-            borderRadius: '999px',
             background: driver?.teamColor ?? 'var(--accent-red)',
-            boxShadow: `0 0 12px ${driver?.teamColor ?? '#fff'}30`,
           }}
         />
         <div className="min-w-0">
-          <div className="truncate" style={{ fontSize: '16px', lineHeight: 1.05, fontWeight: 900, letterSpacing: '-0.025em', color: 'var(--text-primary)' }}>{driver?.name ?? session.userId}</div>
+          <div className="truncate" style={{ fontSize: '15px', lineHeight: 1.05, fontWeight: 900, letterSpacing: '-0.025em', color: 'var(--text-primary)' }}>{driver?.name ?? session.userId}</div>
           <div className="truncate" style={{ marginTop: '4px', fontSize: '11px', lineHeight: 1, fontWeight: 750, color: 'var(--text-secondary)' }}>{driver?.team}</div>
         </div>
       </div>
 
       <div className="flex items-center justify-center gap-3 min-w-0">
-        <div className="flex items-center justify-center font-black" style={{ width: '34px', height: '34px', borderRadius: '10px', background: 'var(--brand-red)', fontSize: '11px' }}>
+        <div className="flex items-center justify-center font-black" style={{ width: '32px', height: '32px', borderRadius: '4px', background: 'var(--brand-red)', fontSize: '11px' }}>
           F1
         </div>
         <div className="min-w-0">
