@@ -89,12 +89,26 @@ export default function SessionControlDock() {
       </footer>
 
       {showPitModal && <PitModal onClose={() => setShowPitModal(false)} />}
-      {showEndDialog && <EndSessionDialog onCancel={() => setShowEndDialog(false)} onConfirm={confirmEnd} />}
+      {showEndDialog && (
+        <EndSessionDialog
+          focusMs={Math.max(0, session.studyElapsedMs - (session.accumulatedPitMs ?? 0))}
+          onCancel={() => setShowEndDialog(false)}
+          onConfirm={confirmEnd}
+        />
+      )}
     </>
   )
 }
 
-function EndSessionDialog({ onCancel, onConfirm }: { onCancel: () => void; onConfirm: () => void }) {
+function EndSessionDialog({
+  focusMs,
+  onCancel,
+  onConfirm,
+}: {
+  focusMs: number
+  onCancel: () => void
+  onConfirm: () => void
+}) {
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onCancel()
@@ -105,17 +119,24 @@ function EndSessionDialog({ onCancel, onConfirm }: { onCancel: () => void; onCon
 
   return (
     <div className="dialog-overlay animate-fade-in" onClick={onCancel} role="presentation">
-      <div className="dialog-panel" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="end-session-title">
-        <div style={{ padding: '28px 28px 22px' }}>
-          <div className="section-label" style={{ color: 'var(--brand-red)' }}>Retire from session</div>
-          <h2 id="end-session-title" style={{ marginTop: '8px', fontSize: '28px', fontWeight: 900, letterSpacing: '-0.03em' }}>공부를 끝낼까요?</h2>
-          <p style={{ marginTop: '10px', fontSize: '13px', lineHeight: 1.65, color: 'var(--text-secondary)' }}>
-            현재 집중 세션을 종료하고 FAST FORWARD로 나머지 퀄리파잉 결과를 확인합니다.
+      <div className="dialog-panel end-session-dialog" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="end-session-title">
+        <div className="end-session-dialog__body">
+          <div className="end-session-dialog__icon" aria-hidden="true">
+            <span />
+          </div>
+          <div className="section-label end-session-dialog__eyebrow">Retire from session</div>
+          <h2 id="end-session-title">세션을 종료할까요?</h2>
+          <p>
+            선택한 드라이버는 <strong>DNF 처리</strong>되고, 나머지 퀄리파잉은 Fast Forward로 정산됩니다.
           </p>
+          <div className="end-session-dialog__record">
+            <span>현재 집중 기록</span>
+            <strong className="mono-value">{formatStudyTime(focusMs)}</strong>
+          </div>
         </div>
-        <div className="flex gap-3" style={{ padding: '0 20px 20px' }}>
-          <button onClick={onCancel} className="control-button flex-1">계속하기</button>
-          <button onClick={onConfirm} className="control-button control-button--danger flex-1">End Session</button>
+        <div className="end-session-dialog__actions">
+          <button onClick={onCancel} className="control-button">세션으로 돌아가기</button>
+          <button onClick={onConfirm} className="control-button end-session-dialog__confirm">종료하고 결과 보기</button>
         </div>
       </div>
     </div>
