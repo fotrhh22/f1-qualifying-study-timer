@@ -31,48 +31,40 @@ export default function PitModal({ onClose }: PitModalProps) {
 
   return (
     <div className="dialog-overlay animate-fade-in" onClick={onClose} role="presentation">
-      <div className="dialog-panel" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="break-dialog-title">
-        <div style={{ padding: '28px 28px 22px' }}>
-          <div className="section-label" style={{ color: 'var(--accent-yellow)' }}>Pit stop</div>
-          <div id="break-dialog-title" className="font-black tracking-tight leading-none" style={{ marginTop: '8px', fontSize: '28px', color: 'var(--text-primary)' }}>
-            휴식할까요?
+      <div className="dialog-panel end-session-dialog break-session-dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="break-dialog-title">
+        <div className="end-session-dialog__body">
+          <div className="end-session-dialog__icon break-session-dialog__icon" aria-hidden="true">
+            <span />
           </div>
-          <div className="mt-3 leading-relaxed" style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>
+          <div className="section-label break-session-dialog__eyebrow">Pit stop</div>
+          <h2 id="break-dialog-title">휴식할까요?</h2>
+          <p>
             휴식 시간을 선택하면 공부 타이머가 멈추고 드라이버는 PIT로 들어갑니다.
-          </div>
-        </div>
-
-        <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          </p>
+          <div className="break-session-dialog__options" aria-label="휴식 시간 선택">
             {PIT_OPTIONS.map(({ minutes, label, desc }) => (
               <button
                 key={minutes}
                 onClick={() => handlePit(minutes)}
-                className="flex-1 flex flex-col items-center justify-center transition-all active:scale-[0.97]"
-                style={{
-                  minHeight: '82px',
-                  background: 'rgba(255,211,64,0.08)',
-                  border: '1px solid rgba(255,211,64,0.24)',
-                  borderRadius: 'var(--radius-control)',
-                  color: 'var(--text-primary)',
-                  cursor: 'pointer',
-                }}
+                className="break-session-dialog__option"
               >
-                <span className="font-black leading-none" style={{ fontSize: '26px' }}>{label}</span>
-                <span style={{ marginTop: '4px', fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--accent-yellow)' }}>
+                <strong className="mono-value">{label}</strong>
+                <span>
                   MIN · {desc}
                 </span>
               </button>
             ))}
           </div>
-          <div style={{ textAlign: 'center', fontSize: '9px', color: 'var(--text-muted)', letterSpacing: '0.06em' }}>
+          <div className="break-session-dialog__note">
             휴식 중 다른 드라이버는 계속 달립니다
           </div>
+        </div>
+        <div className="end-session-dialog__actions break-session-dialog__actions">
           <button
             onClick={onClose}
-            className="control-button w-full"
+            className="control-button"
           >
-            계속하기
+            세션으로 돌아가기
           </button>
         </div>
       </div>
