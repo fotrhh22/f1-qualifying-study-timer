@@ -99,7 +99,11 @@ lapTime = trackBaseTime × paceFactor
 | Track rendering | SVG Path API |
 | Distribution | Static Export, PWA |
 
-## 로컬 실행
+## 로컬 실행 및 배포 현황
+
+### 배포 서비스
+
+[F1 Qualifying Study Timer 바로가기](https://f1-qualifying-study-timer.vercel.app/)
 
 ### 요구 사항
 
@@ -138,19 +142,6 @@ src/
 docs/
 └── engine.md     # 레이스 엔진 상세 설계
 ```
-
-## 로드맵
-
-- [x] 드라이버·서킷·시간 설정 흐름
-- [x] 실시간 퀄리파잉 시뮬레이션
-- [x] 랩타임 랭킹과 SVG 트랙 렌더링
-- [x] PIT STOP과 Fast Forward
-- [x] 최종 결과 화면
-- [ ] 22개 서킷 전수 시각 검증
-- [ ] 시뮬레이션 밸런스 조정
-- [ ] 엔진 단위 테스트 및 재현 가능한 random seed
-- [ ] PWA 설치·오프라인 동작 검증
-- [ ] 접근성과 성능 개선
 
 ## 데이터와 크레딧
 
