@@ -40,9 +40,6 @@ export default function SessionControlDock() {
   const isPit = session.userStatus === 'PIT'
   const isApproaching = session.userStatus === 'APPROACHING_PIT'
   const isDnf = session.userStatus === 'DNF'
-  const progress = session.studyTargetMs > 0
-    ? Math.min(Math.max(session.studyElapsedMs / session.studyTargetMs, 0), 1)
-    : 0
   const pitRemaining = isPit && session.pitEndAt ? Math.max(session.pitEndAt - now, 0) : 0
   const approachRemaining = isApproaching && session.pitApproachEndAt ? Math.max(Math.ceil((session.pitApproachEndAt - now) / 1000), 0) : 0
   const statusText = isFinished ? 'FINISHED'
@@ -66,14 +63,6 @@ export default function SessionControlDock() {
       <footer className="session-command-rail">
         <div className="session-command-rail__status">
           <span className={`session-status ${statusClass}`}>{statusText}</span>
-          <div className="session-command-progress" aria-label={`Session progress ${Math.round(progress * 100)} percent`}>
-            <div className="session-command-progress__track" aria-hidden="true">
-              <div className="session-command-progress__value" style={{ width: `${progress * 100}%` }} />
-            </div>
-            <span className="mono-value" style={{ width: '31px', textAlign: 'right', fontSize: '9px', color: 'var(--text-muted)' }}>
-              {Math.round(progress * 100)}%
-            </span>
-          </div>
         </div>
 
         {isFast ? (
