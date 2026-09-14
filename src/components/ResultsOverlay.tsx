@@ -72,7 +72,7 @@ export default function ResultsOverlay() {
             <section className="results-podium-section" aria-label="Top three drivers">
               <div className="results-podium-heading">
                 <strong>Top 3</strong>
-                <span>Qualifying podium</span>
+                <span>Session podium</span>
               </div>
               <div className="results-podium">
                 <PodiumDriver entry={top3[1]} place={2} />
