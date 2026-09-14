@@ -123,8 +123,9 @@ export interface SessionState {
   phase: SessionPhase
   trackId: string
   userId: string            // 유저가 선택한 드라이버 id
-  studyTargetMs: number     // 목표 공부 시간 (ms)
-  studyElapsedMs: number    // 경과 공부 시간 (ms)
+  sessionTargetMs: number   // 설정한 전체 세션 시간 (ms)
+  sessionElapsedMs: number  // 휴식을 포함한 전체 세션 경과 시간 (ms)
+  focusElapsedMs: number    // 사용자가 실제로 집중한 누적 시간 (ms)
 
   // 유저 상태
   userStatus: UserStatus

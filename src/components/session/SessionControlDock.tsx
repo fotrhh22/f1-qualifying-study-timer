@@ -91,7 +91,7 @@ export default function SessionControlDock() {
       {showPitModal && <PitModal onClose={() => setShowPitModal(false)} />}
       {showEndDialog && (
         <EndSessionDialog
-          focusMs={Math.max(0, session.studyElapsedMs - (session.accumulatedPitMs ?? 0))}
+          focusMs={Math.max(0, session.focusElapsedMs)}
           onCancel={() => setShowEndDialog(false)}
           onConfirm={confirmEnd}
         />

@@ -16,7 +16,7 @@ interface SessionStore {
   rafId: number | null
 
   // 액션
-  startSession: (driverId: string, trackId: string, studyTargetMs: number) => void
+  startSession: (driverId: string, trackId: string, sessionTargetMs: number) => void
   stopSession: () => void
   userPit: (minutes: PitDuration) => void
   userDnf: () => void
@@ -35,7 +35,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
   session: null,
   rafId: null,
 
-  startSession: (driverId, trackId, studyTargetMs) => {
+  startSession: (driverId, trackId, sessionTargetMs) => {
     // Cancel only the web animation loop here. Native startActivity replaces any
     // stale Live Activity atomically; calling stop/start back-to-back can race.
     const existingRafId = get().rafId
@@ -74,8 +74,9 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       phase: 'RUNNING',
       trackId,
       userId: driverId,
-      studyTargetMs,
-      studyElapsedMs: 0,
+      sessionTargetMs,
+      sessionElapsedMs: 0,
+      focusElapsedMs: 0,
       userStatus: 'RUNNING',
       pitApproachEndAt: null,
       pitEndAt: null,

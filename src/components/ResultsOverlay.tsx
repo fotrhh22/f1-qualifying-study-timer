@@ -5,23 +5,10 @@ import { useRouter } from 'next/navigation'
 import { useMemo } from 'react'
 import type { RankingEntry } from '@/engine/types'
 import { DRIVER_FACE } from '@/data/images'
+import { getFullTeamName } from '@/data/teamNames'
 import { formatGap, formatLapTime, formatStudyTime } from '@/engine/lapTime'
 import { computeRanking, useRacers, useSession, useSessionStore, useTrack } from '@/store/sessionStore'
 import { useSetupStore } from '@/store/setupStore'
-
-const TEAM_FULL_NAMES: Record<string, string> = {
-  Alpine: 'BWT Alpine Formula One Team',
-  McLaren: 'McLaren Mastercard Formula 1 Team',
-  Mercedes: 'Mercedes-AMG PETRONAS Formula 1 Team',
-  'Red Bull': 'Oracle Red Bull Racing',
-  Ferrari: 'Scuderia Ferrari HP',
-  Williams: 'Atlassian Williams F1 Team',
-  'Racing Bulls': 'Visa Cash App Racing Bulls',
-  'Aston Martin': 'Aston Martin Aramco Formula One Team',
-  Haas: 'TGR HAAS F1 TEAM',
-  Audi: 'Audi Revolut F1 Team',
-  Cadillac: 'Cadillac Formula 1 Team',
-}
 
 export default function ResultsOverlay() {
   const router = useRouter()
@@ -36,7 +23,7 @@ export default function ResultsOverlay() {
 
   const userEntry = ranking.find((entry) => entry.isUser)
   const top3 = ranking.slice(0, 3)
-  const focusTime = Math.max(0, session.studyElapsedMs - (session.accumulatedPitMs ?? 0))
+  const focusTime = Math.max(0, session.focusElapsedMs)
 
   const leaveResults = (destination: string) => {
     stopSession()
@@ -62,23 +49,35 @@ export default function ResultsOverlay() {
         </header>
 
         <div className="results-body">
-          {top3.length >= 3 && (
-            <section className="results-podium-section" aria-label="Top three drivers">
-              <div className="results-podium">
-                <PodiumDriver entry={top3[1]} place={2} />
-                <PodiumDriver entry={top3[0]} place={1} />
-                <PodiumDriver entry={top3[2]} place={3} />
+          {userEntry && (
+            <section className="results-user-hero" aria-label="Your session result">
+              <div className="results-user-hero__heading">Your result</div>
+              <div className="results-user-hero__content">
+                <div className="results-user-position">
+                  <strong>P{userEntry.position}</strong>
+                  <span>/ 22</span>
+                </div>
+                <div className="results-user-meta" aria-label="Your session summary">
+                  <span><strong>{formatStudyTime(focusTime)}</strong> Focus</span>
+                  <i aria-hidden="true">·</i>
+                  <span><strong>{userEntry.totalLaps}</strong> Laps</span>
+                  <i aria-hidden="true">·</i>
+                  <span>Best <strong>{userEntry.bestLap !== null ? formatLapTime(userEntry.bestLap) : '—'}</strong></span>
+                </div>
               </div>
             </section>
           )}
 
-          {userEntry && (
-            <section className="results-summary" aria-label="Session summary">
-              <div className="results-stat-grid">
-                <StatItem label="Focus time" value={formatStudyTime(focusTime)} />
-                <StatItem label="Best lap" value={userEntry.bestLap !== null ? formatLapTime(userEntry.bestLap) : '—'} />
-                <StatItem label="Final position" value={`P${userEntry.position}`} subValue="/ 22" highlight />
-                <StatItem label="Laps completed" value={`${userEntry.totalLaps}`} subValue="LAPS" />
+          {top3.length >= 3 && (
+            <section className="results-podium-section" aria-label="Top three drivers">
+              <div className="results-podium-heading">
+                <strong>Top 3</strong>
+                <span>Qualifying podium</span>
+              </div>
+              <div className="results-podium">
+                <PodiumDriver entry={top3[1]} place={2} />
+                <PodiumDriver entry={top3[0]} place={1} />
+                <PodiumDriver entry={top3[2]} place={3} />
               </div>
             </section>
           )}
@@ -102,7 +101,8 @@ export default function ResultsOverlay() {
 
         <footer className="results-actions">
           <button onClick={() => leaveResults('/')} className="results-button results-button--secondary">
-            Home
+            <span aria-hidden="true">←</span>
+            <span>Home</span>
           </button>
           <button onClick={() => leaveResults('/setup/driver')} className="results-button results-button--primary">
             <span>New session</span>
@@ -117,6 +117,9 @@ export default function ResultsOverlay() {
 function ClassificationRow({ entry }: { entry: RankingEntry }) {
   const hasLap = entry.bestLap !== null
   const medal = entry.position <= 3 ? entry.position : undefined
+  const nameParts = entry.name.trim().split(/\s+/)
+  const surname = nameParts.pop() ?? entry.name
+  const givenName = nameParts.join(' ')
 
   return (
     <div
@@ -127,27 +130,15 @@ function ClassificationRow({ entry }: { entry: RankingEntry }) {
     >
       <span className="results-position" data-medal={medal}>{entry.position}</span>
       <div className="results-driver-cell">
-        <div
-          className="results-driver-avatar"
-          style={{ backgroundColor: `${entry.teamColor}22`, borderColor: `${entry.teamColor}66` }}
-        >
-          {DRIVER_FACE[entry.racerId] && (
-            <Image
-              src={DRIVER_FACE[entry.racerId]}
-              alt=""
-              fill
-              sizes="32px"
-              style={{ objectFit: 'cover', objectPosition: 'top center' }}
-              unoptimized
-            />
-          )}
+        <div className="results-driver-name">
+          {givenName && <span>{givenName} </span>}
+          <strong>{surname}</strong>
         </div>
-        <div className="results-driver-copy">
-          <strong>{entry.name}</strong>
-          {entry.isUser && <span>YOU</span>}
-        </div>
+        {entry.isUser && <span className="results-driver-you">YOU</span>}
       </div>
-      <span className="results-team-col results-team-name">{TEAM_FULL_NAMES[entry.teamName] || entry.teamName}</span>
+      <span className="results-team-col results-team-name" title={getFullTeamName(entry.teamName)}>
+        {getFullTeamName(entry.teamName)}
+      </span>
       <span className="results-lap-time">
         {entry.isDnf && !hasLap ? 'DNF' : hasLap ? formatLapTime(entry.bestLap!) : '—'}
       </span>
@@ -191,27 +182,5 @@ function PodiumDriver({ entry, place }: { entry: RankingEntry; place: 1 | 2 | 3 
         </div>
       </div>
     </article>
-  )
-}
-
-function StatItem({
-  label,
-  value,
-  highlight,
-  subValue,
-}: {
-  label: string
-  value: string
-  highlight?: boolean
-  subValue?: string
-}) {
-  return (
-    <div className="results-stat" data-highlight={highlight || undefined}>
-      <span>{label}</span>
-      <div>
-        <strong>{value}</strong>
-        {subValue && <small>{subValue}</small>}
-      </div>
-    </div>
   )
 }

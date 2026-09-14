@@ -89,7 +89,7 @@ export default function BroadcastFeed() {
     lastCheckRef.current = now
 
     const newEvents: FeedEvent[] = []
-    const remainingTimeMs = session.studyTargetMs - session.studyElapsedMs
+    const remainingTimeMs = session.sessionTargetMs - session.sessionElapsedMs
     const isFinalMinutes = remainingTimeMs <= 180000 // 3분 이하
 
     // 1. 현재 랭킹 정보를 기반으로 드라이버별 포지션 구하기

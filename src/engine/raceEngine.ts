@@ -350,12 +350,18 @@ export function tickEngine(state: SessionState, deltaMs: number): SessionState {
     exitProb = 0.20
   }
 
-  // 공부 타이머 갱신 — PIT 중에도 세션 시간 소모 (#10)
-  // RUNNING / APPROACHING_PIT / PIT 모두 포함 (피트 시간이 세션 전체 시간에서 차감됨)
-  const newElapsed =
-    state.phase === 'RUNNING' && state.userStatus !== 'DNF'
-      ? state.studyElapsedMs + deltaMs
-      : state.studyElapsedMs
+  // 전체 세션 시간은 사용자 휴식 여부와 무관하게 흐른다.
+  const newSessionElapsed =
+    state.phase === 'RUNNING'
+      ? state.sessionElapsedMs + deltaMs
+      : state.sessionElapsedMs
+
+  // Focus 시간은 사용자가 요청한 휴식 구간만 제외한다.
+  // 레이서가 경기 로직상 자동으로 IN_PIT이어도 userStatus는 RUNNING이므로 계속 누적된다.
+  const newFocusElapsed =
+    state.phase === 'RUNNING' && state.userStatus === 'RUNNING'
+      ? state.focusElapsedMs + deltaMs
+      : state.focusElapsedMs
 
   const newAccumulatedPitMs =
     state.phase === 'RUNNING' && state.userStatus === 'PIT'
@@ -441,7 +447,7 @@ export function tickEngine(state: SessionState, deltaMs: number): SessionState {
         // AI 드라이버는 트랙 혼잡도 확률 필터 적용 (유저는 100% 즉시 복귀)
         const shouldExit = racer.isUser || Math.random() < exitProb
         if (shouldExit) {
-          const sessionProgress = state.studyTargetMs > 0 ? Math.min(1, newElapsed / state.studyTargetMs) : 0
+          const sessionProgress = state.sessionTargetMs > 0 ? Math.min(1, newSessionElapsed / state.sessionTargetMs) : 0
           const result = transitionRacer(racer, now, track.trackBaseTimeMs, newDnfCount, isSessionEnded, sessionProgress)
           newRacers[id] = result.racer
           if (result.dnfOccurred) { newDnfCount++; newDnfThisTick = true }
@@ -486,7 +492,7 @@ export function tickEngine(state: SessionState, deltaMs: number): SessionState {
         newFlag === 'YELLOW' && racer.status === 'FLYING_LAP'
           ? 1000 + Math.random() * 2000
           : 0
-      const sessionProgress = state.studyTargetMs > 0 ? Math.min(1, newElapsed / state.studyTargetMs) : 0
+      const sessionProgress = state.sessionTargetMs > 0 ? Math.min(1, newSessionElapsed / state.sessionTargetMs) : 0
       const result = transitionRacer(racer, now, track.trackBaseTimeMs, newDnfCount, isSessionEnded, sessionProgress, yellowPenaltyMs)
       newRacers[id] = result.racer
       if (result.dnfOccurred) { newDnfCount++; newDnfThisTick = true }
@@ -537,7 +543,7 @@ export function tickEngine(state: SessionState, deltaMs: number): SessionState {
 
   // 타이머 종료 → FAST_FORWARD 전환
   let newPhase: SessionState['phase'] = state.phase
-  if (state.phase === 'RUNNING' && newElapsed >= state.studyTargetMs) {
+  if (state.phase === 'RUNNING' && newSessionElapsed >= state.sessionTargetMs) {
     newPhase = 'FAST_FORWARD'
     // 피트 대기 시간을 FF 배속으로 압축
     newRacers = compressPitTimesForFF(newRacers, now, state.fastForwardMultiplier)
@@ -626,7 +632,8 @@ export function tickEngine(state: SessionState, deltaMs: number): SessionState {
   return {
     ...state,
     phase: newPhase,
-    studyElapsedMs: Math.min(newElapsed, state.studyTargetMs),
+    sessionElapsedMs: Math.min(newSessionElapsed, state.sessionTargetMs),
+    focusElapsedMs: Math.min(newFocusElapsed, state.sessionTargetMs),
     userStatus: newUserStatus,
     pitApproachEndAt: newUserStatus === 'APPROACHING_PIT' ? state.pitApproachEndAt : null,
     racers: newRacers,

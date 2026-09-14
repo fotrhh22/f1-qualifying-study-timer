@@ -50,8 +50,9 @@ Zustand store는 `requestAnimationFrame`으로 실제 경과 시간을 측정합
 | `phase` | 현재 세션 단계 |
 | `trackId` | 선택한 서킷 |
 | `userId` | 사용자가 선택한 드라이버 |
-| `studyTargetMs` | 목표 세션 시간 |
-| `studyElapsedMs` | 현재까지 흐른 세션 시간 |
+| `sessionTargetMs` | 설정한 전체 세션 시간 |
+| `sessionElapsedMs` | 휴식을 포함해 현재까지 흐른 세션 시간 |
+| `focusElapsedMs` | 사용자가 요청한 휴식을 제외한 실제 집중 시간 |
 | `userStatus` | 사용자의 주행·휴식 상태 |
 | `racers` | 22명의 런타임 상태 |
 | `fastForwardMultiplier` | 종료 정산 배속 |
@@ -179,7 +180,7 @@ lapVariation = random(-1.2%, 1.2%) × trackBaseTime
 ### 세션 진행에 따른 트랙 개선
 
 ```text
-sessionProgress = clamp(studyElapsedMs / studyTargetMs, 0, 1)
+sessionProgress = clamp(sessionElapsedMs / sessionTargetMs, 0, 1)
 sessionProgressPenalty = trackBaseTime × 0.05 × (1 - sessionProgress)
 ```
 
@@ -260,17 +261,18 @@ stateDiagram-v2
 
 트랙 위에서 PIT을 요청하면 차량을 즉시 순간이동시키지 않습니다. 현재 상태의 남은 진행 시간을 계산해 피트 입구까지 주행한 뒤 `FORCED_PIT`으로 전환합니다. 이미 피트에 있다면 즉시 휴식을 시작합니다.
 
-현재 구현에서 PIT 중에도 전체 세션 시계인 `studyElapsedMs`는 계속 증가합니다. 대신 PIT 체류 시간은 `accumulatedPitMs`에 별도로 누적됩니다.
+전체 세션 시계인 `sessionElapsedMs`는 사용자의 PIT 요청 여부와 관계없이 계속 증가합니다. `focusElapsedMs`는 `userStatus === RUNNING`일 때만 증가하므로 사용자가 요청한 `APPROACHING_PIT`과 `PIT` 구간은 집중 시간에서 제외됩니다.
 
 ```text
-netStudyTime = studyElapsedMs - accumulatedPitMs
+sessionRemainingMs = sessionTargetMs - sessionElapsedMs
+focusElapsedMs += deltaMs  // userStatus === RUNNING인 경우만
 ```
 
-휴식이 끝나면 사용자 차량은 `OUT_LAP`으로 복귀합니다. AI 드라이버와 전체 세션은 사용자 PIT 중에도 계속 진행됩니다.
+드라이버가 경기 로직에 따라 자동으로 `IN_PIT`에 들어간 경우에는 `userStatus`가 `RUNNING`으로 유지되므로 집중 시간이 계속 누적됩니다. 휴식이 끝나면 사용자 차량은 `OUT_LAP`으로 복귀하며, AI 드라이버와 전체 세션은 사용자 휴식 중에도 계속 진행됩니다.
 
 ## Fast Forward와 종료
 
-`studyElapsedMs`가 `studyTargetMs`에 도달하면 세션은 `FAST_FORWARD`로 전환됩니다.
+`sessionElapsedMs`가 `sessionTargetMs`에 도달하면 세션은 `FAST_FORWARD`로 전환됩니다.
 
 1. 현재 피트에 있는 차량의 남은 대기 시간을 배속에 맞게 압축합니다.
 2. 트랙 위 차량은 설정된 배율로 남은 상태를 진행합니다.
