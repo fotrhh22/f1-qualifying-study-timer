@@ -951,6 +951,173 @@ html, body {
 }
 .break-session-dialog__actions { grid-template-columns: 1fr; }
 
+/* Guide & Regulation Dialogs (F1 Telemetry Theme) */
+.guide-dialog {
+  position: relative;
+  width: min(520px, calc(100vw - 32px));
+  max-height: min(620px, calc(100vh - 40px));
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(225, 6, 0, 0.12), transparent 48%),
+    var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+}
+
+.guide-dialog::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--brand-red), rgba(255, 255, 255, 0.8), var(--brand-red), transparent);
+  content: '';
+}
+
+.guide-dialog__header {
+  padding: 22px 24px 12px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.guide-dialog__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--brand-red);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.guide-dialog__eyebrow::before,
+.guide-dialog__eyebrow::after {
+  content: '';
+  width: 12px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+.guide-dialog__title {
+  margin-top: 6px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.guide-dialog__body {
+  padding: 16px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.guide-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-left: 3px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.guide-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-left-color: var(--brand-red);
+}
+
+.guide-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.guide-card__tag {
+  color: var(--brand-red);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.guide-card__name {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.guide-card__desc {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  line-height: 1.55;
+  font-weight: 450;
+}
+
+.guide-dialog__actions {
+  padding: 12px 20px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.guide-dialog__actions .control-button {
+  width: 100%;
+  min-height: 44px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+
+/* Regulation Dialog */
+.regulation-dialog {
+  position: relative;
+  width: min(440px, calc(100vw - 32px));
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 128, 0, 0.12), transparent 48%),
+    var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+}
+
+.regulation-dialog::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #ff8000, rgba(255, 255, 255, 0.8), #ff8000, transparent);
+  content: '';
+}
+
+.regulation-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 14px 0;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+}
+
+.regulation-flow__step {
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.regulation-flow__arrow {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 11px;
+}
+
 @media (max-width: 520px) {
   .end-session-dialog__body { padding: 23px 20px 18px; }
   .end-session-dialog h2 { font-size: 24px; }

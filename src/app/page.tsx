@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSetupStore } from '@/store/setupStore'
 
@@ -7,6 +7,15 @@ export default function Home() {
   const router = useRouter()
   const reset = useSetupStore((s) => s.reset)
   const [showInfo, setShowInfo] = useState(false)
+
+  useEffect(() => {
+    if (!showInfo) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowInfo(false)
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [showInfo])
 
   const handleStart = () => {
     reset()
@@ -142,68 +151,76 @@ export default function Home() {
         Circuit layouts © julesr0y/f1-circuits-svg, CC-BY-4.0
       </p>
 
-      {/* F1 퀄리파잉 공부 타이머 설명 바텀시트 */}
+      {/* F1 퀄리파잉 공부 타이머 설명 다이얼로그 */}
       {showInfo && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center"
-          style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)' }}
+          className="dialog-overlay animate-fade-in"
           onClick={() => setShowInfo(false)}
+          role="presentation"
         >
           <div
-            className="flex flex-col w-full overflow-hidden animate-slide-up"
-            style={{
-              maxWidth: '480px',
-              background: '#17181F',
-              borderRadius: '28px 28px 0 0',
-              paddingBottom: 'env(safe-area-inset-bottom, 16px)',
-            }}
+            className="dialog-panel guide-dialog"
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="guide-title"
           >
-            {/* 핸들 */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div style={{ width: '36px', height: '4px', borderRadius: '99px', background: 'rgba(255,255,255,0.12)' }} />
+            {/* 헤더 */}
+            <div className="guide-dialog__header">
+              <div className="guide-dialog__eyebrow">Session Briefing</div>
+              <h2 id="guide-title" className="guide-dialog__title">
+                F1 Qualifying Study Timer
+              </h2>
             </div>
 
-            {/* 본문 */}
-            <div style={{ padding: '28px 32px 24px' }}>
-              <div style={{ fontSize: '26px', fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.01em', lineHeight: 1.1, marginBottom: '16px' }}>
-                F1 Qualifying Study Timer
-              </div>
-              <div className="flex flex-col gap-4 text-[13px]" style={{ color: 'rgba(255,255,255,0.45)', fontWeight: 500, lineHeight: 1.6 }}>
-                <div>
-                  ⏱️ <span style={{ color: '#FFFFFF', fontWeight: 700 }}>공부 시간 = F1 퀄리파잉 세션</span><br />
+            {/* 본문 브리핑 카드 */}
+            <div className="guide-dialog__body">
+              <div className="guide-card">
+                <div className="guide-card__header">
+                  <span className="guide-card__name">공부 시간 = F1 퀄리파잉 세션</span>
+                  <span className="guide-card__tag">01 · SESSION</span>
+                </div>
+                <p className="guide-card__desc">
                   설정한 공부 목표 시간 동안 22명의 F1 드라이버들과 함께 실시간 퀄리파잉(예선) 시뮬레이션이 진행됩니다.
+                </p>
+              </div>
+
+              <div className="guide-card">
+                <div className="guide-card__header">
+                  <span className="guide-card__name">실시간 랭킹 & 페이스 경쟁</span>
+                  <span className="guide-card__tag">02 · TELEMETRY</span>
                 </div>
-                <div>
-                  🏁 <span style={{ color: '#FFFFFF', fontWeight: 700 }}>실시간 랭킹 & 페이스 경쟁</span><br />
-                  내가 집중해서 공부하는 동안, AI 드라이버들은 아웃랩, 플라잉랩, 쿨다운랩을 거치며 각자의 페이스대로 랩타임을 경신하고 순위를 다툽니다.
+                <p className="guide-card__desc">
+                  내가 집중해서 공부하는 동안, AI 드라이버들은 아웃랩·플라잉랩·쿨다운랩을 거치며 각자의 페이스대로 랩타임을 경신하고 순위를 다툽니다.
+                </p>
+              </div>
+
+              <div className="guide-card">
+                <div className="guide-card__header">
+                  <span className="guide-card__name">PIT STOP (전략적 휴식 시스템)</span>
+                  <span className="guide-card__tag">03 · STRATEGY</span>
                 </div>
-                <div>
-                  ☕ <span style={{ color: '#FFFFFF', fontWeight: 700 }}>PIT STOP (휴식 시스템)</span><br />
-                  공부 중 휴식이 필요할 때 5분/10분/15분의 피트스톱을 선언할 수 있습니다. 피트에 들어가면 내 타이머는 일시정지되지만, NPC 드라이버들은 멈추지 않고 트랙을 달립니다.
+                <p className="guide-card__desc">
+                  공부 중 휴식이 필요할 때 5분/10분/15분의 피트스톱을 선언할 수 있습니다. 내 타이머는 일시정지되지만, 경쟁 드라이버들은 멈추지 않고 트랙을 달립니다.
+                </p>
+              </div>
+
+              <div className="guide-card">
+                <div className="guide-card__header">
+                  <span className="guide-card__name">최종 예선 성적표</span>
+                  <span className="guide-card__tag">04 · CLASSIFICATION</span>
                 </div>
-                <div>
-                  📊 <span style={{ color: '#FFFFFF', fontWeight: 700 }}>결과 리포트</span><br />
-                  세션이 종료되면 최종 그리드(출발 순위)와 함께, 내 순수한 공부 시간(피트스톱 제외)과 최고 랩타임 기록이 포함된 예선 성적표를 확인할 수 있습니다.
-                </div>
+                <p className="guide-card__desc">
+                  세션이 종료되면 최종 그리드(출발 순위)와 함께, 순수한 공부 시간(피트스톱 제외)과 최고 랩타임 기록이 포함된 예선 성적표를 확인할 수 있습니다.
+                </p>
               </div>
             </div>
 
             {/* 닫기 버튼 */}
-            <div style={{ padding: '0 20px 20px' }}>
+            <div className="guide-dialog__actions">
               <button
                 onClick={() => setShowInfo(false)}
-                className="w-full transition-all active:scale-[0.97]"
-                style={{
-                  padding: '18px 0',
-                  background: 'rgba(255,255,255,0.06)',
-                  borderRadius: '16px',
-                  color: 'rgba(255,255,255,0.55)',
-                  fontSize: '17px',
-                  fontWeight: 700,
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
+                className="control-button"
               >
                 확인
               </button>

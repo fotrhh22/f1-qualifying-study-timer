@@ -25,6 +25,15 @@ export default function SetupTimePage() {
     }
   }, [driverId, trackId, router])
 
+  useEffect(() => {
+    if (!showMinInfo) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowMinInfo(false)
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [showMinInfo])
+
   if (!driverId || !trackId) {
     return null
   }
@@ -418,56 +427,71 @@ export default function SetupTimePage() {
         </div>
       </div>
 
-      {/* 최소 시간 이유 바텀시트 */}
+      {/* 최소 시간 안내 다이얼로그 */}
       {showMinInfo && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center"
-          style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)' }}
+          className="dialog-overlay animate-fade-in"
           onClick={() => setShowMinInfo(false)}
+          role="presentation"
         >
           <div
-            className="flex flex-col w-full overflow-hidden"
-            style={{
-              maxWidth: '480px',
-              background: '#17181F',
-              borderRadius: '28px 28px 0 0',
-              paddingBottom: 'env(safe-area-inset-bottom, 16px)',
-            }}
+            className="dialog-panel regulation-dialog"
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="regulation-title"
           >
-            {/* 핸들 */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div style={{ width: '36px', height: '4px', borderRadius: '99px', background: 'rgba(255,255,255,0.12)' }} />
+            {/* 헤더 */}
+            <div className="guide-dialog__header">
+              <div
+                className="guide-dialog__eyebrow"
+                style={{ color: '#FF8000' }}
+              >
+                FIA Regulation
+              </div>
+              <h2 id="regulation-title" className="guide-dialog__title">
+                왜 최소 10분인가요?
+              </h2>
             </div>
 
             {/* 본문 */}
-            <div style={{ padding: '28px 32px 24px' }}>
-              <div style={{ fontSize: '32px', fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.01em', lineHeight: 1.1, marginBottom: '12px' }}>
-                왜 최소 10분인가요?
+            <div className="guide-dialog__body">
+              <div className="regulation-flow" aria-hidden="true">
+                <span className="regulation-flow__step">PIT EXIT</span>
+                <span className="regulation-flow__arrow">→</span>
+                <span className="regulation-flow__step">OUT LAP</span>
+                <span className="regulation-flow__arrow">→</span>
+                <span className="regulation-flow__step" style={{ color: '#FF8000' }}>FLYING LAP</span>
+                <span className="regulation-flow__arrow">→</span>
+                <span className="regulation-flow__step">IN LAP</span>
               </div>
-              <div style={{ fontSize: '15px', color: 'rgba(255,255,255,0.45)', fontWeight: 500, lineHeight: 1.7 }}>
-                드라이버가 피트에서 대기하고<br />
-                OUT LAP → FLYING LAP을 완주하려면<br />
-                평균 <span style={{ color: '#FF8000', fontWeight: 700 }}>4~6분</span>이 필요합니다.<br />
-                여유 있게 <span style={{ color: '#FFFFFF', fontWeight: 700 }}>10분</span>을 최솟값으로 설정했습니다.
+
+              <div className="guide-card" style={{ borderLeftColor: '#FF8000' }}>
+                <div className="guide-card__header">
+                  <span className="guide-card__name">실제 퀄리파잉 랩 사이클</span>
+                  <span className="guide-card__tag" style={{ color: '#FF8000' }}>4~6 MIN</span>
+                </div>
+                <p className="guide-card__desc">
+                  드라이버가 피트에서 출차하여 타이어 웜업(Out Lap) 후 공식 랩타임(Flying Lap)을 완주하기까지 1회 런에 평균 4~6분이 소요됩니다.
+                </p>
+              </div>
+
+              <div className="guide-card" style={{ borderLeftColor: '#FFFFFF' }}>
+                <div className="guide-card__header">
+                  <span className="guide-card__name">최소 퀄리파잉 세션 권장치</span>
+                  <span className="guide-card__tag" style={{ color: '#FFFFFF' }}>10 MIN MINIMUM</span>
+                </div>
+                <p className="guide-card__desc">
+                  22명의 AI 드라이버들이 공정하게 트랙에 나와 랩타임을 경신하고 순위를 다투는 실시간 시뮬레이션을 위해 세션 최솟값을 10분으로 규정했습니다.
+                </p>
               </div>
             </div>
 
-            {/* 닫기 버튼 */}
-            <div style={{ padding: '0 20px 20px' }}>
+            {/* 액션 버튼 */}
+            <div className="guide-dialog__actions">
               <button
                 onClick={() => setShowMinInfo(false)}
-                className="w-full transition-all active:scale-[0.97]"
-                style={{
-                  padding: '18px 0',
-                  background: 'rgba(255,255,255,0.06)',
-                  borderRadius: '16px',
-                  color: 'rgba(255,255,255,0.55)',
-                  fontSize: '17px',
-                  fontWeight: 700,
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
+                className="control-button"
               >
                 확인
               </button>
